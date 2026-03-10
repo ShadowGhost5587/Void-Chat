@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VoidChat — No Trace. No History. Just Now.</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Google+Sans+Text:wght@400;500&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #21242f;
+      --surface3: #282b38;
+      --surface4: #2f3340;
+      --border: rgba(255,255,255,0.06);
+      --border2: rgba(100,149,237,0.5);
+      --accent: #6495ed;
+      --accent-hover: #7aa5f0;
+      --accent2: #8ab4f8;
+      --accent3: #81c995;
+      --accent-teal: #4fc3f7;
+      --text: #e8eaed;
+      --text2: #9aa0a6;
+      --muted: #5f6368;
+      --green: #81c995;
+      --red: #f28b82;
+      --yellow: #fdd663;
+      --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.25);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Google Sans Text', 'Segoe UI', sans-serif; overflow: hidden; }
+
+    #app { position: relative; z-index: 1; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
+    /* ══════════════════════════════════════
+       LANDING
+    ══════════════════════════════════════ */
+    #landing {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      width: 100%;
+      max-width: 960px;
+      height: 100vh;
+      max-height: 100vh;
+      padding: 0;
+      animation: fadeUp 0.5s cubic-bezier(0.2,0,0,1) both;
+    }
+
+    /* Left panel */
+    .landing-left {
+      width: 320px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px 36px;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      position: relative;
+    }
+
+    .logo-wrap { display: flex; flex-direction: column; gap: 0; margin-bottom: 44px; }
+    .logo-icon { width: 48px; height: 48px; margin-bottom: 20px; }
+    .logo-title {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .logo-tagline {
+      font-size: 0.8rem;
+      color: var(--text2);
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .feature-list { display: flex; flex-direction: column; gap: 6px; }
+    .feature-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 12px 14px; border-radius: 12px;
+      transition: background 0.15s;
+    }
+    .feature-item:hover { background: var(--surface2); }
+    .feature-dot {
+      width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1rem;
+      background: var(--surface3);
+    }
+    .feature-text { font-size: 0.82rem; color: var(--text2); line-height: 1.5; padding-top: 2px; }
+    .feature-text strong { color: var(--text); display: block; font-size: 0.84rem; font-weight: 500; margin-bottom: 2px; }
+
+    .left-footer { margin-top: auto; padding-top: 32px; }
+    .tag-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ftag {
+      font-size: 0.7rem; color: var(--text2);
+      background: var(--surface3);
+      border-radius: 6px; padding: 4px 10px; letter-spacing: 0.3px;
+      font-weight: 500;
+    }
+
+    /* Right panel */
+    .landing-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px 44px;
+      overflow-y: auto;
+    }
+
+    .right-header { margin-bottom: 28px; }
+    .right-title {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 1.4rem; font-weight: 600; margin-bottom: 6px; color: var(--text);
+    }
+    .right-sub { font-size: 0.84rem; color: var(--text2); line-height: 1.6; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 28px;
+      gap: 0;
+    }
+    .tab {
+      flex: 1; padding: 12px 16px; border: none; background: transparent;
+      color: var(--text2); font-family: 'Google Sans', sans-serif; font-size: 0.84rem;
+      font-weight: 500; cursor: pointer; transition: all 0.2s;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      letter-spacing: 0.1px;
+    }
+    .tab:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+    .tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+
+    /* Tab panels */
+    .tab-panel { display: none; flex-direction: column; gap: 18px; }
+    .tab-panel.active { display: flex; }
+
+    /* Field */
+    .field-wrap { display: flex; flex-direction: column; gap: 6px; }
+    .field-label {
+      font-size: 0.78rem; color: var(--text2); font-weight: 500;
+      display: flex; align-items: center; gap: 6px; letter-spacing: 0.1px;
+    }
+    .field-label .req { color: var(--red); font-size: 0.85rem; }
+    .field-hint { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+
+    .inp {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 11px 14px; color: var(--text); font-family: 'Google Sans Text', sans-serif; font-size: 0.9rem;
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
+    }
+    .inp::placeholder { color: var(--muted); }
+    .inp:focus { border-color: var(--accent2); box-shadow: 0 0 0 2px rgba(138,180,248,0.12); }
+    .inp:hover:not(:focus) { border-color: rgba(255,255,255,0.12); }
+    .inp.error-field { border-color: rgba(242,139,130,0.6); }
+
+    /* ID box */
+    .id-box {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .id-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 4px; font-weight: 500; letter-spacing: 0.2px; text-transform: uppercase; }
+    .id-value { font-family: 'Roboto Mono', monospace; font-size: 0.85rem; font-weight: 500; color: var(--accent2); word-break: break-all; letter-spacing: 0.3px; }
+
+    .copy-btn {
+      background: transparent; border: 1px solid rgba(138,180,248,0.25); border-radius: 6px;
+      padding: 6px 14px; color: var(--accent2); font-family: 'Google Sans', sans-serif; font-size: 0.75rem;
+      cursor: pointer; transition: all 0.15s; white-space: nowrap; font-weight: 500;
+    }
+    .copy-btn:hover { background: rgba(138,180,248,0.1); border-color: rgba(138,180,248,0.5); }
+    .copy-btn.copied { color: var(--green); border-color: rgba(129,201,149,0.35); background: rgba(129,201,149,0.08); }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--muted); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.3px;
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* Buttons */
+    .btn {
+      border: none; border-radius: 8px; padding: 11px 20px;
+      font-family: 'Google Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+      cursor: pointer; transition: all 0.15s; width: 100%; letter-spacing: 0.2px;
+    }
+    .btn.purple {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .btn.purple:hover { background: var(--accent-hover); box-shadow: 0 2px 6px rgba(0,0,0,0.35); }
+    .btn.cyan {
+      background: #1e6e3c;
+      color: #c6efcc;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .btn.cyan:hover { background: #225e38; filter: brightness(1.1); }
+    .btn:active { transform: scale(0.99); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; filter: none; }
+
+    /* Status */
+    .status-row { display: flex; justify-content: flex-start; }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 6px;
+      font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1px;
+    }
+    .status-pill.ready   { background: rgba(129,201,149,0.08); color: var(--green);  border: 1px solid rgba(129,201,149,0.2); }
+    .status-pill.pending { background: rgba(253,214,99,0.08);  color: var(--yellow); border: 1px solid rgba(253,214,99,0.2); }
+    .status-pill.error   { background: rgba(242,139,130,0.08); color: var(--red);    border: 1px solid rgba(242,139,130,0.2); }
+    .status-pill.info    { background: rgba(100,149,237,0.08); color: var(--accent2); border: 1px solid rgba(100,149,237,0.2); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .dot.pulse { animation: dotPulse 1.8s infinite; }
+
+    /* ══════════════════════════════════════
+       WAITING SCREEN
+    ══════════════════════════════════════ */
+    #waiting-screen {
+      display: none; flex-direction: row; align-items: center; justify-content: center;
+      width: 100%; height: 100vh; gap: 0; animation: fadeUp 0.4s cubic-bezier(0.2,0,0,1) both;
+    }
+    .waiting-inner {
+      display: flex; flex-direction: column; align-items: center; gap: 24px;
+      max-width: 400px; width: 100%; padding: 48px 32px;
+    }
+    .waiting-ring {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: var(--surface2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+      position: relative; box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      animation: ringPulse 2.5s infinite;
+    }
+    .waiting-ring::after {
+      content: ''; position: absolute; inset: -10px; border-radius: 50%;
+      border: 1px solid rgba(79,195,247,0.18); animation: ringExpand 2.5s infinite;
+    }
+    .waiting-title {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 1.3rem; font-weight: 600; text-align: center; color: var(--text);
+    }
+    .waiting-sub { font-size: 0.84rem; color: var(--text2); text-align: center; line-height: 1.7; }
+    .share-box {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px 24px; width: 100%; text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .share-label { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; font-weight: 500; margin-bottom: 10px; }
+    .share-id { font-family: 'Roboto Mono', monospace; font-size: 1.1rem; font-weight: 500; color: var(--accent2); letter-spacing: 1px; margin-bottom: 16px; word-break: break-all; }
+    .cancel-btn {
+      background: transparent; border: 1px solid var(--border); border-radius: 8px;
+      padding: 9px 24px; color: var(--text2); font-family: 'Google Sans', sans-serif;
+      font-size: 0.84rem; cursor: pointer; transition: all 0.15s; font-weight: 500;
+    }
+    .cancel-btn:hover { border-color: rgba(242,139,130,0.4); color: var(--red); background: rgba(242,139,130,0.05); }
+
+    /* ══════════════════════════════════════
+       CHAT SCREEN
+    ══════════════════════════════════════ */
+    #chat-screen {
+      display: none; flex-direction: row; width: 100%; height: 100vh;
+      max-width: 1080px; margin: 0 auto; animation: fadeUp 0.35s cubic-bezier(0.2,0,0,1) both;
+    }
+
+    /* Chat sidebar */
+    .chat-sidebar {
+      width: 256px; flex-shrink: 0; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      background: var(--surface); padding: 0;
+    }
+    .sidebar-header {
+      padding: 10px 16px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .sidebar-logo-text {
+      font-family: 'Google Sans', sans-serif;
+      font-size: 1rem; font-weight: 600; color: var(--text);
+    }
+    .sidebar-logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px rgba(129,201,149,0.6); animation: dotPulse 1.8s infinite; }
+
+    .peer-card {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px;
+    }
+    .peer-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .peer-av-lg {
+      width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 600;
+    }
+    .peer-av-lg.purple { background: #3c4fe0; color: #fff; }
+    .peer-av-lg.cyan   { background: #1a6e5c; color: #81d4b5; }
+    .peer-card-name { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+    .peer-card-role { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+
+    .peer-card-meta { display: flex; flex-direction: column; gap: 5px; }
+    .meta-row { display: flex; align-items: center; gap: 7px; font-size: 0.75rem; color: var(--muted); }
+    .meta-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+
+    .sidebar-info { padding: 14px 16px; flex: 1; }
+    .info-block { margin-bottom: 18px; }
+    .info-title { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; font-weight: 500; margin-bottom: 8px; }
+    .info-tag {
+      display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;
+      border-radius: 6px; background: var(--surface3);
+      font-size: 0.75rem; color: var(--text2); margin: 2px 2px 2px 0;
+    }
+
+    .sidebar-footer { padding: 14px 16px; border-top: 1px solid var(--border); }
+    .end-btn {
+      width: 100%; background: rgba(242,139,130,0.06); border: 1px solid rgba(242,139,130,0.2);
+      border-radius: 8px; padding: 10px; color: var(--red); font-family: 'Google Sans', sans-serif;
+      font-size: 0.82rem; cursor: pointer; transition: all 0.15s; font-weight: 500;
+    }
+    .end-btn:hover { background: rgba(242,139,130,0.12); }
+    .topbar-end-btn {
+      display: flex; align-items: center; gap: 7px;
+      background: rgba(242,139,130,0.08); border: 1px solid rgba(242,139,130,0.25);
+      border-radius: 8px; padding: 7px 14px; color: var(--red);
+      font-family: 'Google Sans', sans-serif; font-size: 0.82rem; font-weight: 500;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .topbar-end-btn:hover { background: rgba(242,139,130,0.16); border-color: rgba(242,139,130,0.45); }
+    .topbar-end-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+    /* Chat main */
+    .chat-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+    .chat-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      background: rgba(15,17,23,0.9); backdrop-filter: blur(20px); flex-shrink: 0;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar-av {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 600;
+    }
+    .topbar-av.purple { background: #3c4fe0; color: #fff; }
+    .topbar-av.cyan   { background: #1a6e5c; color: #81d4b5; }
+    .topbar-name { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+    .topbar-sub  { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+    .live-badge  {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; color: var(--green); font-weight: 500;
+      background: rgba(129,201,149,0.08); border: 1px solid rgba(129,201,149,0.2);
+      padding: 4px 10px; border-radius: 100px;
+    }
+
+    .msgs { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 2px; scroll-behavior: smooth; }
+    .msgs::-webkit-scrollbar { width: 4px; }
+    .msgs::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+    .msgs::-webkit-scrollbar-track { background: transparent; }
+
+    .msg-row { display: flex; flex-direction: column; margin-bottom: 6px; animation: msgPop 0.18s ease both; }
+    .msg-row.out { align-items: flex-end; }
+    .msg-row.in  { align-items: flex-start; }
+    .bubble {
+      max-width: 65%; padding: 10px 14px; border-radius: 18px;
+      font-size: 0.88rem; line-height: 1.55; word-break: break-word;
+    }
+    .msg-row.out .bubble {
+      background: #1a3a6e;
+      border-bottom-right-radius: 4px; color: #c8dcff;
+    }
+    .msg-row.in  .bubble {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px; color: var(--text);
+    }
+    .msg-meta { font-size: 0.68rem; color: var(--muted); margin-top: 3px; padding: 0 4px; display: flex; align-items: center; gap: 5px; }
+    .msg-dots { display: inline-flex; align-items: center; gap: 3px; }
+    .msg-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--muted); transition: background 0.3s ease;
+    }
+    .msg-dot.filled { background: var(--accent2); }
+
+    .sys-msg {
+      align-self: center; font-size: 0.72rem;
+      color: var(--muted); padding: 5px 14px;
+      background: var(--surface2); border-radius: 100px; border: 1px solid var(--border);
+      margin: 8px 0;
+    }
+
+    /* Typing indicator — inline in message stream */
+    .typing-wrap { display: none; align-items: flex-start; margin-bottom: 6px; animation: msgPop 0.18s ease both; }
+    .typing-wrap.visible { display: flex; }
+    .typing-dots {
+      display: inline-flex; align-items: center; gap: 4px; padding: 10px 14px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 18px; border-bottom-left-radius: 4px;
+    }
+    .td { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); animation: tdBounce 1.2s infinite; }
+    .td:nth-child(2) { animation-delay: 0.2s; }
+    .td:nth-child(3) { animation-delay: 0.4s; }
+    .typing-name { font-size: 0.68rem; color: var(--muted); margin-top: 3px; padding: 0 4px; }
+
+    .chat-foot {
+      padding: 12px 20px 16px; border-top: 1px solid var(--border);
+      background: rgba(15,17,23,0.9); backdrop-filter: blur(20px); flex-shrink: 0;
+    }
+    .input-row { display: flex; gap: 8px; align-items: flex-end; }
+    .msg-inp {
+      flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 22px;
+      padding: 11px 18px; color: var(--text); font-family: 'Google Sans Text', sans-serif; font-size: 0.9rem;
+      outline: none; resize: none; max-height: 120px; line-height: 1.45; overflow-y: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .msg-inp::placeholder { color: var(--muted); }
+    .msg-inp:focus { border-color: rgba(138,180,248,0.4); box-shadow: 0 0 0 2px rgba(138,180,248,0.08); }
+    .send-btn {
+      width: 42px; height: 42px; border: none; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      background: var(--accent);
+      transition: all 0.15s;
+    }
+    .send-btn:hover { background: var(--accent-hover); transform: scale(1.05); }
+    .send-btn:active { transform: scale(0.97); }
+    .send-btn svg { fill: #fff; }
+    .foot-hint { font-size: 0.7rem; color: var(--muted); margin-top: 7px; padding: 0 4px; }
+
+    /* Sub-tabs inside Private Room */
+    .sub-tabs {
+      display: flex; gap: 6px;
+      background: var(--surface3); border-radius: 8px; padding: 3px;
+    }
+    .sub-tab {
+      flex: 1; padding: 8px 12px; border: none; border-radius: 6px; background: transparent;
+      color: var(--text2); font-family: 'Google Sans', sans-serif; font-size: 0.82rem;
+      font-weight: 500; cursor: pointer; transition: all 0.15s;
+    }
+    .sub-tab:hover { color: var(--text); }
+    .sub-tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+    .sub-panel { display: none; flex-direction: column; gap: 14px; }
+    .sub-panel.active { display: flex; }
+
+    /* Join method toggle */
+    .join-toggle {
+      display: flex; gap: 0;
+      border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+    }
+    .join-toggle-btn {
+      flex: 1; padding: 8px 12px; border: none; background: transparent;
+      color: var(--text2); font-family: 'Google Sans', sans-serif; font-size: 0.82rem;
+      font-weight: 500; cursor: pointer; transition: all 0.15s;
+    }
+    .join-toggle-btn:first-child { border-right: 1px solid var(--border); }
+    .join-toggle-btn:hover { color: var(--text); background: var(--surface3); }
+    .join-toggle-btn.active { background: var(--surface3); color: var(--accent2); }
+
+    /* Invite link box shown after room created */
+    .invite-box {
+      background: var(--surface3); border: 1px solid rgba(138,180,248,0.2); border-radius: 10px;
+      padding: 14px 16px; animation: fadeUp 0.3s ease both;
+    }
+    .invite-box-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 500; margin-bottom: 8px; }
+    .invite-link-row { display: flex; align-items: center; gap: 8px; }
+    .invite-link-text {
+      flex: 1; font-family: 'Roboto Mono', monospace; font-size: 0.72rem; color: var(--accent2);
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+      padding: 8px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ══════════════════════════════════════
+       ANIMATIONS
+    ══════════════════════════════════════ */
+    @keyframes fadeUp    { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes dotPulse  { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
+    @keyframes ringPulse { 0%,100%{box-shadow:0 0 0 0 rgba(79,195,247,0.25)} 50%{box-shadow:0 0 0 14px rgba(79,195,247,0)} }
+    @keyframes ringExpand{ from{transform:scale(1);opacity:0.3} to{transform:scale(1.5);opacity:0} }
+    @keyframes msgPop    { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes tdBounce  { 0%,60%,100%{transform:translateY(0);opacity:0.3} 30%{transform:translateY(-5px);opacity:0.9} }
+
+    /* ══════════════════════════════════════
+       FILE SHARING
+    ══════════════════════════════════════ */
+    .attach-btn {
+      width: 42px; height: 42px; border: 1px solid var(--border); border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      background: var(--surface2); transition: all 0.15s; color: var(--muted);
+    }
+    .attach-btn:hover { border-color: rgba(138,180,248,0.3); color: var(--accent2); background: rgba(138,180,248,0.07); }
+    .attach-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .bubble-img { max-width: 280px; max-height: 220px; border-radius: 12px; display: block; cursor: pointer; transition: opacity 0.2s; border: 1px solid var(--border); }
+    .bubble-img:hover { opacity: 0.9; }
+    .file-card {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 16px; max-width: 280px; cursor: pointer; transition: all 0.15s; text-decoration: none;
+    }
+    .file-card:hover { border-color: rgba(138,180,248,0.3); background: rgba(138,180,248,0.05); }
+    .file-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--surface3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.1rem; }
+    .file-info { min-width: 0; }
+    .file-name { font-size: 0.82rem; color: var(--text); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+    .file-size { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+    .transfer-wrap { display: flex; flex-direction: column; gap: 5px; margin-top: 5px; max-width: 280px; }
+    .transfer-bar-bg { background: var(--surface3); border-radius: 4px; height: 3px; overflow: hidden; }
+    .transfer-bar { height: 100%; background: var(--accent2); transition: width 0.15s; border-radius: 4px; width: 0%; }
+    .transfer-label { font-size: 0.7rem; color: var(--muted); }
+    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out; animation: fadeUp 0.2s ease; }
+    #lightbox.open { display: flex; }
+    #lightbox img { max-width: 90vw; max-height: 88vh; border-radius: 12px; box-shadow: 0 8px 60px rgba(0,0,0,0.8); cursor: default; }
+    /* Session timer */
+    .session-timer {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 1.4rem; font-weight: 500; color: var(--accent2);
+      letter-spacing: 2px; line-height: 1;
+    }
+
+    /* Connection quality */
+    .conn-quality-row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+    .conn-bars { display: flex; align-items: flex-end; gap: 2px; height: 16px; }
+    .conn-bar {
+      width: 4px; border-radius: 2px;
+      background: var(--surface4);
+      transition: background 0.4s ease;
+    }
+    .conn-bar.b1 { height: 4px; }
+    .conn-bar.b2 { height: 7px; }
+    .conn-bar.b3 { height: 11px; }
+    .conn-bar.b4 { height: 16px; }
+    .conn-bars.quality-good  .conn-bar { background: var(--green); }
+    .conn-bars.quality-ok    .conn-bar.b1,
+    .conn-bars.quality-ok    .conn-bar.b2,
+    .conn-bars.quality-ok    .conn-bar.b3 { background: var(--yellow); }
+    .conn-bars.quality-ok    .conn-bar.b4 { background: var(--surface4); }
+    .conn-bars.quality-weak  .conn-bar.b1,
+    .conn-bars.quality-weak  .conn-bar.b2 { background: var(--red); }
+    .conn-bars.quality-weak  .conn-bar.b3,
+    .conn-bars.quality-weak  .conn-bar.b4 { background: var(--surface4); }
+    .conn-label { font-size: 0.78rem; color: var(--text2); font-weight: 500; }
+
+    /* Lightbox close button — proper X icon */
+    #lightbox-close {
+      position: absolute; top: 18px; right: 18px;
+      width: 38px; height: 38px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.18s;
+      color: var(--text2);
+    }
+    #lightbox-close:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.25); color: var(--text); transform: scale(1.08); }
+    #lightbox-close svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; }
+
+    /* ══════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════ */
+    @media (max-width: 768px) {
+      #landing { flex-direction: column; overflow-y: auto; height: auto; min-height: 100vh; }
+      .landing-left { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 32px 24px 24px; }
+      .feature-list { display: none; }
+      .landing-right { padding: 28px 24px 36px; }
+      #chat-screen { flex-direction: column; }
+      .chat-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; }
+      .sidebar-info, .sidebar-footer { display: none; }
+      .sidebar-header { flex: 1; border-bottom: none; padding: 12px 16px; }
+      .msgs { padding: 14px 16px; }
+      .chat-foot { padding: 10px 16px 16px; }
+      .bubble { max-width: 85%; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══════════ LANDING ══════════ -->
+  <div id="landing">
+
+    <!-- Left branding panel -->
+    <div class="landing-left">
+      <div class="logo-wrap">
+        <svg class="logo-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="48" height="48" rx="12" fill="#1a2a4a"/>
+          <path d="M14 18h20M14 24h14M14 30h17" stroke="#8ab4f8" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="36" cy="33" r="7" fill="#0f1117"/>
+          <circle cx="36" cy="33" r="6" fill="#1e6e3c"/>
+          <path d="M33.5 33l2 2 3.5-3.5" stroke="#81c995" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="logo-title">VoidChat</div>
+        <div class="logo-tagline">No trace · No history · Just now</div>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-dot">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8ab4f8" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <div class="feature-text"><strong>Peer-to-Peer Direct</strong>Messages go browser to browser. No server ever sees them.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8ab4f8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <div class="feature-text"><strong>Zero Storage</strong>No database. No logs. Nothing saved anywhere.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8ab4f8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          </div>
+          <div class="feature-text"><strong>Disappears Instantly</strong>Close the tab — conversation gone forever.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-dot">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#81c995" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text"><strong>Free Forever</strong>No account. No subscription. No cost.</div>
+        </div>
+      </div>
+
+      <div class="left-footer">
+        <div class="tag-row">
+          <span class="ftag">P2P</span>
+          <span class="ftag">WEBRTC</span>
+          <span class="ftag">OPEN SOURCE</span>
+          <span class="ftag">NO ACCOUNT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right form panel -->
+    <div class="landing-right">
+      <div class="right-header">
+        <div class="right-title">Start a conversation</div>
+        <div class="right-sub">Choose a mode · Enter your name · Connect instantly</div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab t0 active" onclick="switchTab(0)">Quick Chat</button>
+        <button class="tab t1" onclick="switchTab(1)">Private Room</button>
+      </div>
+
+      <!-- TAB 0: QUICK CHAT -->
+      <div class="tab-panel active" id="panel-0">
+        <div class="field-wrap">
+          <div class="field-label">Your Name <span class="req">*</span></div>
+          <input class="inp" id="quick-myname-input" type="text" placeholder="Enter your name" autocomplete="off" spellcheck="false" maxlength="24"/>
+          <span class="field-hint">Required — this is what the other person will see</span>
+        </div>
+
+        <div class="id-box">
+          <div>
+            <div class="id-label">Your Session ID</div>
+            <div class="id-value" id="my-id-display">generating...</div>
+          </div>
+          <button class="copy-btn" id="copy-quick-btn" onclick="copyQuickId()">COPY</button>
+        </div>
+
+        <div class="divider">CONNECT TO SOMEONE</div>
+
+        <div class="field-wrap">
+          <div class="field-label">Paste their Session ID</div>
+          <input class="inp" id="quick-peer-input" type="text" placeholder="Enter session ID" autocomplete="off" spellcheck="false"/>
+        </div>
+
+        <button class="btn purple" id="quick-connect-btn" onclick="quickConnect()" disabled>Connect &amp; Chat</button>
+
+        <div class="status-row">
+          <div class="status-pill info" id="quick-status">
+            <div class="dot pulse"></div>
+            <span id="quick-status-text">Initializing...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 1: ROOM -->
+      <div class="tab-panel" id="panel-1">
+
+        <!-- Sub-tabs: Create / Join -->
+        <div class="sub-tabs">
+          <button class="sub-tab active" id="sub-create-btn" onclick="switchSubTab('create')">Create Room</button>
+          <button class="sub-tab" id="sub-join-btn" onclick="switchSubTab('join')">Join Room</button>
+        </div>
+
+        <!-- CREATE ROOM -->
+        <div class="sub-panel active" id="sub-create">
+          <div class="field-wrap">
+            <div class="field-label">Your Name <span class="req">*</span></div>
+            <input class="inp" id="create-myname" type="text" placeholder="Enter your name" autocomplete="off" spellcheck="false" maxlength="24"/>
+          </div>
+          <div class="field-wrap">
+            <div class="field-label">Room ID <span class="req">*</span></div>
+            <input class="inp" id="create-room-id" type="text" placeholder="Enter room ID" autocomplete="off" spellcheck="false" maxlength="40"/>
+            <span class="field-hint">Min 8 characters · Must include at least one number</span>
+          </div>
+          <div class="field-wrap">
+            <div class="field-label">Room Password <span class="req">*</span></div>
+            <input class="inp" id="create-room-pass" type="password" placeholder="Enter room password" autocomplete="off" spellcheck="false" maxlength="40"/>
+            <span class="field-hint">Min 8 characters · Must include at least one number</span>
+          </div>
+          <button class="btn purple" id="create-room-btn" onclick="createRoom()" disabled>Create Room</button>
+          <div class="status-row">
+            <div class="status-pill info" id="create-status">
+              <div class="dot pulse"></div>
+              <span id="create-status-text">Initializing...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- JOIN ROOM -->
+        <div class="sub-panel" id="sub-join">
+          <div class="field-wrap">
+            <div class="field-label">Your Name <span class="req">*</span></div>
+            <input class="inp" id="join-myname" type="text" placeholder="Enter your name" autocomplete="off" spellcheck="false" maxlength="24"/>
+          </div>
+
+          <!-- Join method toggle -->
+          <div class="join-toggle">
+            <button class="join-toggle-btn active" id="join-by-link-btn" onclick="switchJoinMethod('link')">Via Link</button>
+            <button class="join-toggle-btn" id="join-by-id-btn" onclick="switchJoinMethod('id')">Via Room ID</button>
+          </div>
+
+          <!-- Link section -->
+          <div id="join-link-section">
+            <div class="field-wrap">
+              <div class="field-label">Invite Link <span class="req">*</span></div>
+              <input class="inp" id="join-link" type="text" placeholder="Paste invite link" autocomplete="off" spellcheck="false"/>
+              <span class="field-hint">Joins instantly — no password needed</span>
+            </div>
+          </div>
+
+          <!-- ID section -->
+          <div id="join-id-section" style="display:none; flex-direction:column; gap:14px;">
+            <div class="field-wrap">
+              <div class="field-label">Room ID <span class="req">*</span></div>
+              <input class="inp" id="join-room-id" type="text" placeholder="Enter room ID" autocomplete="off" spellcheck="false" maxlength="40"/>
+            </div>
+            <div class="field-wrap">
+              <div class="field-label">Room Password <span class="req">*</span></div>
+              <input class="inp" id="join-room-pass" type="password" placeholder="Enter room password" autocomplete="off" spellcheck="false" maxlength="40"/>
+            </div>
+          </div>
+
+          <button class="btn cyan" id="join-room-btn" onclick="joinRoom()" disabled>Join Room</button>
+          <div class="status-row">
+            <div class="status-pill info" id="join-status">
+              <div class="dot pulse"></div>
+              <span id="join-status-text">Initializing...</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════ WAITING ══════════ -->
+  <div id="waiting-screen">
+    <div class="waiting-inner">
+    <div class="waiting-ring">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <div class="waiting-title">Room is open.<br/>Waiting for someone...</div>
+      <div class="waiting-sub">Share the link or room ID with the person you want to chat with.</div>
+      <div class="share-box">
+        <div class="share-label">Invite Link</div>
+        <div class="share-id" id="waiting-link-display" style="font-size:0.78rem;letter-spacing:0px;word-break:break-all;">—</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
+          <button class="copy-btn" id="waiting-copy-link-btn" onclick="copyInviteLink()">COPY LINK</button>
+          <button class="copy-btn" id="waiting-copy-id-btn" onclick="copyRoomId()">COPY ID</button>
+        </div>
+      </div>
+      <button class="cancel-btn" onclick="cancelWait()">Cancel &amp; Destroy Room</button>
+    </div>
+  </div>
+
+  <!-- ══════════ CHAT ══════════ -->
+  <div id="chat-screen">
+
+    <!-- Sidebar -->
+    <div class="chat-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="sidebar-logo-dot"></div>
+          <div class="sidebar-logo-text">VoidChat</div>
+        </div>
+
+      <!-- Hidden elements for JS compatibility -->
+      <span id="chat-av" style="display:none;"></span>
+      <span id="chat-peer-name" style="display:none;"></span>
+      <span id="chat-peer-role" style="display:none;"></span>
+      <span id="chat-mode-row" style="display:none;"></span>
+      </div>
+
+      <div class="sidebar-info">
+        <div class="info-block">
+          <div class="info-title">Session Duration</div>
+          <div class="session-timer" id="session-timer">00:00</div>
+        </div>
+        <div class="info-block">
+          <div class="info-title">Connection</div>
+          <div class="conn-quality-row">
+            <div class="conn-bars" id="conn-bars">
+              <div class="conn-bar b1"></div>
+              <div class="conn-bar b2"></div>
+              <div class="conn-bar b3"></div>
+              <div class="conn-bar b4"></div>
+            </div>
+            <span class="conn-label" id="conn-label">Good</span>
+          </div>
+        </div>
+        <div class="info-block">
+          <div class="info-title">You are</div>
+          <div class="peer-card-name" id="chat-my-name" style="font-size:1rem;">—</div>
+        </div>
+        <div class="info-block">
+          <div class="info-title">Session</div>
+          <span class="info-tag">P2P encrypted</span>
+          <span class="info-tag">No logs</span>
+          <div id="e2e-badge" style="display:none;margin-top:8px;display:none;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;background:rgba(129,201,149,0.08);border:1px solid rgba(129,201,149,0.25);font-size:0.72rem;color:var(--green);font-weight:500;letter-spacing:0.2px;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            E2E Encrypted
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="end-btn" onclick="disconnect()">End Session</button>
+      </div>
+    </div>
+
+    <!-- Main chat area -->
+    <div class="chat-main">
+      <div class="chat-topbar">
+        <div class="topbar-left">
+          <div class="topbar-av purple" id="topbar-av">?</div>
+          <div>
+            <div class="topbar-name" id="topbar-peer-name">—</div>
+            <div class="topbar-sub">no history · no logs · disappears on close</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="live-badge">
+            <div class="dot" style="background:var(--green);animation:dotPulse 1.4s infinite;"></div>
+            LIVE
+          </div>
+          <button class="topbar-end-btn" onclick="disconnect()">
+            <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            End
+          </button>
+        </div>
+      </div>
+
+      <div class="msgs" id="msgs">
+        <div class="typing-wrap" id="typing-wrap">
+          <div style="display:flex;flex-direction:column;align-items:flex-start;">
+            <div class="typing-dots">
+              <div class="td"></div><div class="td"></div><div class="td"></div>
+            </div>
+            <div class="typing-name" id="typing-name-label"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-foot">
+        <div class="input-row">
+          <button class="attach-btn" onclick="openFilePicker()" title="Send file or photo">
+            <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <textarea class="msg-inp" id="msg-inp" placeholder="Type a message..." rows="1"
+            onkeydown="handleKey(event)" oninput="handleTyping()"></textarea>
+          <button class="send-btn" onclick="sendMsg()">
+            <svg width="16" height="16" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" onclick="closeLightbox()">
+    <button id="lightbox-close" onclick="closeLightbox()" title="Close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()"/>
+  </div>
+
+  <!-- Hidden file input -->
+  <input type="file" id="file-input" accept="image/*,.pdf,.txt,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.mp3,.mp4,.mov" style="display:none;" onchange="handleFileSelect(event)"/>
+
+</div>
+
+<script>
+  // ─────────────────────────────────────────
+  //  STATE
+  // ─────────────────────────────────────────
+  let quickPeer    = null;
+  let quickMyId    = null;
+  let conn         = null;
+  let activeMode   = null;
+  let activeMyName = null;
+  let activeRoomName = null;
+  let roomPeer     = null;
+  let activeRoomPass = null;
+  let typingTO     = null;
+  let isTyping     = false;
+
+  // ─────────────────────────────────────────
+  //  E2E ENCRYPTION  (ECDH + AES-256-GCM)
+  // ─────────────────────────────────────────
+  let myECDHKeyPair   = null;   // { publicKey, privateKey }
+  let sharedAESKey    = null;   // CryptoKey — derived after handshake
+  let myPublicKeyB64  = null;   // base64 of exported SPKI public key
+  let e2eReady        = false;
+
+  async function initCrypto() {
+    myECDHKeyPair = await crypto.subtle.generateKey(
+      { name: 'ECDH', namedCurve: 'P-256' },
+      false,   // private key not extractable
+      ['deriveKey']
+    );
+    const exported = await crypto.subtle.exportKey('spki', myECDHKeyPair.publicKey);
+    myPublicKeyB64 = btoa(String.fromCharCode(...new Uint8Array(exported)));
+  }
+
+  async function deriveSharedKey(theirPublicKeyB64) {
+    const raw       = Uint8Array.from(atob(theirPublicKeyB64), c => c.charCodeAt(0));
+    const theirKey  = await crypto.subtle.importKey(
+      'spki', raw.buffer,
+      { name: 'ECDH', namedCurve: 'P-256' },
+      false, []
+    );
+    sharedAESKey = await crypto.subtle.deriveKey(
+      { name: 'ECDH', public: theirKey },
+      myECDHKeyPair.privateKey,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+    );
+    e2eReady = true;
+    markE2EReady();
+  }
+
+  // Encrypt any JS value → base64 ciphertext string
+  async function encrypt(payload) {
+    if (!sharedAESKey) throw new Error('No shared key');
+    const iv   = crypto.getRandomValues(new Uint8Array(12));
+    const data = new TextEncoder().encode(JSON.stringify(payload));
+    const ct   = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, sharedAESKey, data);
+    // Pack iv + ciphertext together
+    const packed = new Uint8Array(12 + ct.byteLength);
+    packed.set(iv, 0);
+    packed.set(new Uint8Array(ct), 12);
+    return btoa(String.fromCharCode(...packed));
+  }
+
+  // Decrypt base64 ciphertext → original JS value
+  async function decrypt(b64) {
+    if (!sharedAESKey) throw new Error('No shared key');
+    const packed = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const iv     = packed.slice(0, 12);
+    const ct     = packed.slice(12);
+    const plain  = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, sharedAESKey, ct);
+    return JSON.parse(new TextDecoder().decode(plain));
+  }
+
+  // Send a message object — encrypts if e2e is ready, else sends plain
+  async function secureSend(obj) {
+    if (!conn) return;
+    if (e2eReady && obj.type !== 'hello' && obj.type !== 'room-full' && obj.type !== 'wrong-password') {
+      const enc = await encrypt(obj);
+      conn.send({ type: 'enc', enc });
+    } else {
+      conn.send(obj);
+    }
+  }
+
+  // Decrypt incoming encrypted envelope
+  async function decryptIncoming(d) {
+    if (d.type === 'enc' && e2eReady) {
+      try { return await decrypt(d.enc); } catch(e) { return null; }
+    }
+    return d; // unencrypted (handshake messages)
+  }
+
+  function markE2EReady() {
+    const badge = document.getElementById('e2e-badge');
+    if (badge) { badge.style.display = 'flex'; }
+    addSysMsg('🔒 End-to-end encryption active — AES-256-GCM');
+  }
+
+  // ─────────────────────────────────────────
+  //  HELPERS
+  // ─────────────────────────────────────────
+  function genId() {
+    const adj  = ['dark','void','null','zero','ghost','echo','flux','neon','byte','silk','haze','drift','nova','blur','arc'];
+    const noun = ['wolf','hawk','fox','crow','lynx','vibe','node','pulse','core','wave','rift','sync','beam','grid','peak'];
+    return adj[~~(Math.random()*adj.length)] + '-' + noun[~~(Math.random()*noun.length)] + '-' + (~~(Math.random()*900)+100);
+  }
+  function cleanRoom(s) {
+    return s.toLowerCase().trim().replace(/[^a-z0-9\-_]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'').slice(0,40);
+  }
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  }
+
+  // ─────────────────────────────────────────
+  //  BOOT
+  // ─────────────────────────────────────────
+  async function boot() {
+    await initCrypto();
+    const id = genId();
+    quickPeer = new Peer(id, {
+      host: '0.peerjs.com', port: 443, secure: true, path: '/',
+      config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }
+    });
+
+    quickPeer.on('open', (id) => {
+      quickMyId = id;
+      document.getElementById('my-id-display').textContent = id;
+      setStatus('quick',  'ready', 'Ready — share your ID');
+      setStatus('create', 'ready', 'Ready');
+      setStatus('join',   'ready', 'Ready');
+      document.getElementById('quick-connect-btn').disabled = false;
+      document.getElementById('create-room-btn').disabled   = false;
+      document.getElementById('join-room-btn').disabled     = false;
+    });
+
+    quickPeer.on('connection', (c) => {
+      if (activeMode === 'quick' || activeMode === null) {
+        activeMode = 'quick';
+        conn = c;
+        setupConn();
+        c.on('open', () => {
+          const peerName = c.metadata?.name || 'Anonymous';
+          const myName   = document.getElementById('quick-myname-input').value.trim() || 'Anonymous';
+          activeMyName   = myName;
+          showChat('quick', peerName, myName);
+          try { conn.send({ type: 'hello', name: myName, pubkey: myPublicKeyB64 }); } catch(e){}
+        });
+      }
+    });
+
+    quickPeer.on('error', (err) => {
+      if (err.type === 'peer-unavailable') {
+        setStatus('quick', 'error', 'ID not found — check and retry');
+        document.getElementById('quick-connect-btn').disabled = false;
+        setTimeout(() => setStatus('quick', 'ready', 'Ready — share your ID'), 3000);
+      }
+    });
+
+    quickPeer.on('disconnected', () => { try { quickPeer.reconnect(); } catch(e){} });
+  }
+
+  // ─────────────────────────────────────────
+  //  TABS
+  // ─────────────────────────────────────────
+  function switchTab(i) {
+    document.querySelectorAll('.tab').forEach((t,j)       => t.classList.toggle('active', i===j));
+    document.querySelectorAll('.tab-panel').forEach((p,j) => p.classList.toggle('active', i===j));
+  }
+
+  // ─────────────────────────────────────────
+  //  QUICK CHAT
+  // ─────────────────────────────────────────
+  function quickConnect() {
+    const myName = document.getElementById('quick-myname-input').value.trim();
+    const target = document.getElementById('quick-peer-input').value.trim();
+
+    if (!myName) {
+      document.getElementById('quick-myname-input').classList.add('error-field');
+      setStatus('quick', 'error', 'Enter your name first');
+      setTimeout(() => document.getElementById('quick-myname-input').classList.remove('error-field'), 2000);
+      return;
+    }
+    if (!target) { setStatus('quick','error','Paste their ID first'); return; }
+    if (target === quickMyId) { setStatus('quick','error','Cannot connect to yourself'); return; }
+
+    activeMode   = 'quick';
+    activeMyName = myName;
+    setStatus('quick', 'pending', 'Connecting...');
+    document.getElementById('quick-connect-btn').disabled = true;
+
+    conn = quickPeer.connect(target, { reliable: true, metadata: { name: myName } });
+    setupConn();
+    conn.on('open', () => {
+      showChat('quick', 'Connecting...', myName);
+      try { conn.send({ type: 'hello', name: myName, pubkey: myPublicKeyB64 }); } catch(e){}
+    });
+  }
+
+  // ─────────────────────────────────────────
+  //  SUB-TAB SWITCH (Create / Join)
+  // ─────────────────────────────────────────
+  function switchSubTab(which) {
+    document.getElementById('sub-create-btn').classList.toggle('active', which === 'create');
+    document.getElementById('sub-join-btn').classList.toggle('active', which === 'join');
+    document.getElementById('sub-create').classList.toggle('active', which === 'create');
+    document.getElementById('sub-join').classList.toggle('active', which === 'join');
+  }
+
+  // ─────────────────────────────────────────
+  //  INVITE LINK HELPERS
+  // ─────────────────────────────────────────
+  function buildInviteLink(roomId, password) {
+    const base = window.location.href.split('?')[0];
+    const encoded = btoa(roomId + ':' + password);
+    return base + '?join=' + encoded;
+  }
+
+  function parseInviteLink(link) {
+    try {
+      const url = new URL(link);
+      const encoded = url.searchParams.get('join');
+      if (!encoded) return null;
+      const decoded = atob(encoded);
+      const sep = decoded.indexOf(':');
+      if (sep === -1) return null;
+      return { roomId: decoded.slice(0, sep), password: decoded.slice(sep + 1) };
+    } catch(e) { return null; }
+  }
+
+  function handleJoinLinkInput() {}   // kept for URL auto-detect compat
+  function handleJoinIdInput() {}     // no longer used
+
+  function switchJoinMethod(method) {
+    const isLink = method === 'link';
+    document.getElementById('join-by-link-btn').classList.toggle('active', isLink);
+    document.getElementById('join-by-id-btn').classList.toggle('active', !isLink);
+    document.getElementById('join-link-section').style.display = isLink ? '' : 'none';
+    document.getElementById('join-id-section').style.display   = isLink ? 'none' : 'flex';
+    // Clear the inactive section
+    if (isLink) {
+      document.getElementById('join-room-id').value   = '';
+      document.getElementById('join-room-pass').value = '';
+    } else {
+      document.getElementById('join-link').value = '';
+    }
+  }
+
+  // ─────────────────────────────────────────
+  //  CREATE ROOM
+  // ─────────────────────────────────────────
+  function createRoom() {
+    const myName  = document.getElementById('create-myname').value.trim();
+    const rawId   = document.getElementById('create-room-id').value.trim();
+    const rawPass = document.getElementById('create-room-pass').value.trim();
+
+    if (!myName) {
+      document.getElementById('create-myname').classList.add('error-field');
+      setStatus('create', 'error', 'Enter your name first');
+      setTimeout(() => document.getElementById('create-myname').classList.remove('error-field'), 2000);
+      return;
+    }
+    if (!rawId || rawId.length < 8) { setStatus('create', 'error', 'Room ID needs at least 8 characters'); return; }
+    if (!/\d/.test(rawId)) { setStatus('create', 'error', 'Room ID must include at least one number'); return; }
+    if (!rawPass || rawPass.length < 8) { setStatus('create', 'error', 'Password needs at least 8 characters'); return; }
+    if (!/\d/.test(rawPass)) { setStatus('create', 'error', 'Password must include at least one number'); return; }
+
+    const rName   = cleanRoom(rawId);
+    const rPeerId = 'vcr-' + rName;
+    const rPass   = rawPass;
+
+    activeMyName   = myName;
+    activeRoomName = rName;
+    activeRoomPass = rPass;
+
+    document.getElementById('create-room-btn').disabled = true;
+    setStatus('create', 'pending', 'Creating room...');
+
+    if (roomPeer && !roomPeer.destroyed) { try { roomPeer.destroy(); } catch(e){} roomPeer = null; }
+
+    roomPeer = new Peer(rPeerId, {
+      host: '0.peerjs.com', port: 443, secure: true, path: '/',
+      config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }
+    });
+
+    roomPeer.on('open', () => {
+      setStatus('create', 'ready', 'Room open — waiting...');
+      const inviteLink = buildInviteLink(rName, rPass);
+      document.getElementById('waiting-link-display').textContent = inviteLink;
+      showWaiting();
+
+      roomPeer.on('connection', (c) => {
+        if (conn && conn.open) {
+          c.on('open', () => {
+            try { c.send({ type: 'room-full' }); } catch(e){}
+            setTimeout(() => { try { c.close(); } catch(e){} }, 300);
+          });
+          return;
+        }
+        const theirPass = c.metadata?.password;
+        if (theirPass !== rPass) {
+          c.on('open', () => {
+            try { c.send({ type: 'wrong-password' }); } catch(e){}
+            setTimeout(() => { try { c.close(); } catch(e){} }, 300);
+          });
+          return;
+        }
+        activeMode = 'room';
+        conn = c;
+        setupConn();
+        c.on('open', () => {
+          const guestName = c.metadata?.name || 'Anonymous';
+          showChat('room', guestName, myName);
+          try { conn.send({ type: 'hello', name: myName, pubkey: myPublicKeyB64 }); } catch(e){}
+        });
+      });
+    });
+
+    roomPeer.on('error', (err) => {
+      if (err.type === 'unavailable-id') {
+        setStatus('create', 'error', 'Room ID already taken — choose a different one');
+      } else {
+        setStatus('create', 'error', 'Could not create room — try again');
+      }
+      document.getElementById('create-room-btn').disabled = false;
+      activeRoomName = null;
+    });
+  }
+
+  // ─────────────────────────────────────────
+  //  JOIN ROOM
+  // ─────────────────────────────────────────
+  function joinRoom() {
+    const myName  = document.getElementById('join-myname').value.trim();
+    const link    = document.getElementById('join-link').value.trim();
+    const rawId   = document.getElementById('join-room-id').value.trim();
+    const rawPass = document.getElementById('join-room-pass').value.trim();
+
+    if (!myName) {
+      document.getElementById('join-myname').classList.add('error-field');
+      setStatus('join', 'error', 'Enter your name first');
+      setTimeout(() => document.getElementById('join-myname').classList.remove('error-field'), 2000);
+      return;
+    }
+
+    let roomId, password;
+
+    if (link) {
+      const parsed = parseInviteLink(link);
+      if (!parsed) { setStatus('join', 'error', 'Invalid invite link'); return; }
+      roomId   = parsed.roomId;
+      password = parsed.password;
+    } else {
+      if (!rawId) { setStatus('join', 'error', 'Enter a room ID or paste an invite link'); return; }
+      if (!rawPass) { setStatus('join', 'error', 'Enter the room password'); return; }
+      roomId   = cleanRoom(rawId);
+      password = rawPass;
+    }
+
+    activeMyName   = myName;
+    activeRoomName = roomId;
+    activeRoomPass = password;
+
+    document.getElementById('join-room-btn').disabled = true;
+    setStatus('join', 'pending', 'Joining room...');
+
+    joinRoomAsGuest('vcr-' + roomId, myName, password);
+  }
+
+  function joinRoomAsGuest(roomHostId, myName, password) {
+    if (roomPeer && !roomPeer.destroyed) { try { roomPeer.destroy(); } catch(e){} roomPeer = null; }
+
+    const guestId = genId() + '-g';
+    roomPeer = new Peer(guestId, {
+      host: '0.peerjs.com', port: 443, secure: true, path: '/',
+      config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }
+    });
+
+    roomPeer.on('open', () => {
+      conn = roomPeer.connect(roomHostId, { reliable: true, metadata: { name: myName, password } });
+      setupConn();
+      conn.on('open', () => {
+        activeMode = 'room';
+        showChat('room', 'Connecting...', myName);
+        try { conn.send({ type: 'hello', name: myName, pubkey: myPublicKeyB64 }); } catch(e){}
+      });
+      conn.on('error', () => {
+        setStatus('join', 'error', 'Room not found or closed');
+        document.getElementById('join-room-btn').disabled = false;
+        activeRoomName = null;
+        if (roomPeer && !roomPeer.destroyed) { try { roomPeer.destroy(); } catch(e){} roomPeer = null; }
+      });
+    });
+
+    roomPeer.on('error', () => {
+      setStatus('join', 'error', 'Could not connect to room');
+      document.getElementById('join-room-btn').disabled = false;
+      activeRoomName = null;
+    });
+  }
+
+  // ─────────────────────────────────────────
+  //  CONNECTION EVENTS
+  // ─────────────────────────────────────────
+  function setupConn() {
+    // Reset E2E state for new connection
+    sharedAESKey = null; e2eReady = false;
+
+    conn.on('data', async (raw) => {
+      // Decrypt if encrypted envelope
+      const d = await decryptIncoming(raw);
+      if (!d) return; // decryption failed — drop
+
+      if (d.type === 'message') {
+        hideTyping();
+        appendMsg(d.text, 'in');
+        // Send ACK back encrypted
+        if (d.msgId) { try { await secureSend({ type: 'ack', msgId: d.msgId }); } catch(e){} }
+      }
+      else if (d.type === 'room-full') {
+        conn = null;
+        if (roomPeer && !roomPeer.destroyed) { try { roomPeer.destroy(); } catch(e){} roomPeer = null; }
+        activeRoomName = null; activeMode = null;
+        document.getElementById('chat-screen').style.display    = 'none';
+        document.getElementById('waiting-screen').style.display = 'none';
+        document.getElementById('landing').style.display        = 'flex';
+        document.getElementById('join-room-btn').disabled = false;
+        switchTab(1); switchSubTab('join');
+        setStatus('join', 'error', 'Room is already in use — create a new room');
+        setTimeout(() => setStatus('join', 'ready', 'Ready'), 4000);
+      }
+      else if (d.type === 'wrong-password') {
+        conn = null;
+        if (roomPeer && !roomPeer.destroyed) { try { roomPeer.destroy(); } catch(e){} roomPeer = null; }
+        activeRoomName = null; activeMode = null;
+        document.getElementById('chat-screen').style.display    = 'none';
+        document.getElementById('waiting-screen').style.display = 'none';
+        document.getElementById('landing').style.display        = 'flex';
+        document.getElementById('join-room-btn').disabled = false;
+        switchTab(1); switchSubTab('join');
+        setStatus('join', 'error', 'Wrong password — access denied');
+        setTimeout(() => setStatus('join', 'ready', 'Ready'), 4000);
+      }
+      else if (d.type === 'ack') {
+        const dots = document.getElementById('dots-' + d.msgId);
+        if (dots) {
+          const second = dots.querySelectorAll('.msg-dot')[1];
+          if (second) second.classList.add('filled');
+        }
+      }
+      else if (d.type === 'hello') {
+        const n = d.name || 'Anonymous';
+        document.getElementById('chat-peer-name').textContent   = n;
+        document.getElementById('topbar-peer-name').textContent = n;
+        document.getElementById('chat-av').textContent   = n[0]?.toUpperCase() || '?';
+        document.getElementById('topbar-av').textContent = n[0]?.toUpperCase() || '?';
+        // Key exchange — derive shared secret from their public key
+        if (d.pubkey && !e2eReady) {
+          try { await deriveSharedKey(d.pubkey); } catch(err) { console.error('Key derivation failed', err); }
+        }
+      }
+      else if (d.type === 'typing')      { showTyping(); }
+      else if (d.type === 'stop-typing') { hideTyping(); }
+      else if (d.type === 'disconnect')  { handleRemoteDisc(); }
+      else if (d.type === 'file-meta' || d.type === 'file-chunk' || d.type === 'file-end') { handleIncomingFileData(d); }
+    });
+    conn.on('close', handleRemoteDisc);
+    conn.on('error', handleRemoteDisc);
+  }
+
+  // ─────────────────────────────────────────
+  //  SHOW CHAT
+  // ─────────────────────────────────────────
+  function showChat(mode, peerName, myName) {
+    document.getElementById('landing').style.display        = 'none';
+    document.getElementById('waiting-screen').style.display = 'none';
+    document.getElementById('chat-screen').style.display    = 'flex';
+
+    const initial = peerName[0]?.toUpperCase() || '?';
+    const cls     = mode === 'room' ? 'cyan' : 'purple';
+
+    // Sidebar
+    document.getElementById('chat-av').textContent     = initial;
+    document.getElementById('chat-av').className       = 'peer-av-lg ' + cls;
+    document.getElementById('chat-peer-name').textContent  = peerName;
+    document.getElementById('chat-peer-role').textContent  = mode === 'room' ? 'room peer' : 'direct peer';
+    document.getElementById('chat-my-name').textContent    = myName || '—';
+    document.getElementById('chat-mode-row').textContent   = mode === 'room' ? 'private room · no logs' : 'direct p2p · no logs';
+
+    // Topbar
+    document.getElementById('topbar-av').textContent        = initial;
+    document.getElementById('topbar-av').className          = 'topbar-av ' + cls;
+    document.getElementById('topbar-peer-name').textContent = peerName;
+
+    document.getElementById('msgs').innerHTML = '<div class="sys-msg">— Connection established · P2P · No logs —</div>';
+    // Re-append the typing wrap since innerHTML wiped it
+    const typingWrap = document.getElementById('typing-wrap') || (() => {
+      const w = document.createElement('div');
+      w.id = 'typing-wrap'; w.className = 'typing-wrap';
+      w.innerHTML = `<div style="display:flex;flex-direction:column;align-items:flex-start;"><div class="typing-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div><div class="typing-name" id="typing-name-label"></div></div>`;
+      return w;
+    })();
+    document.getElementById('msgs').appendChild(typingWrap);
+    document.getElementById('msg-inp').focus();
+    startSessionTimer();
+    startConnQuality();
+  }
+
+  // ─────────────────────────────────────────
+  //  WAITING
+  // ─────────────────────────────────────────
+  function showWaiting() {
+    document.getElementById('landing').style.display        = 'none';
+    document.getElementById('waiting-screen').style.display = 'flex';
+  }
+
+  function cancelWait() {
+    if (roomPeer && !roomPeer.destroyed) { try { roomPeer.destroy(); } catch(e){} roomPeer = null; }
+    activeRoomName = null; activeMode = null; activeRoomPass = null;
+    document.getElementById('waiting-screen').style.display = 'none';
+    document.getElementById('landing').style.display        = 'flex';
+    document.getElementById('create-myname').value    = '';
+    document.getElementById('create-room-id').value   = '';
+    document.getElementById('create-room-pass').value = '';
+    document.getElementById('create-room-btn').disabled = false;
+    setStatus('create', 'ready', 'Ready');
+  }
+
+  function copyToClipboard(text, btnId, resetLabel) {
+    const b = document.getElementById(btnId);
+    const done = () => {
+      b.textContent = 'COPIED!'; b.classList.add('copied');
+      setTimeout(() => { b.textContent = resetLabel; b.classList.remove('copied'); }, 2000);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+    } else {
+      fallbackCopy(text, done);
+    }
+  }
+
+  function fallbackCopy(text, callback) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand('copy'); callback(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  function copyInviteLink() {
+    const link = document.getElementById('waiting-link-display').textContent;
+    if (!link || link === '—') return;
+    copyToClipboard(link, 'waiting-copy-link-btn', 'COPY LINK');
+  }
+
+  function copyRoomId() {
+    if (!activeRoomName) return;
+    copyToClipboard(activeRoomName, 'waiting-copy-id-btn', 'COPY ID');
+  }
+
+  // ─────────────────────────────────────────
+  //  MESSAGING
+  // ─────────────────────────────────────────
+  async function sendMsg() {
+    if (!conn) return;
+    const inp  = document.getElementById('msg-inp');
+    const text = inp.value.trim();
+    if (!text) return;
+    const msgId = Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+    try { await secureSend({ type: 'message', text, msgId }); } catch(e){ return; }
+    appendMsg(text, 'out', msgId);
+    inp.value = ''; inp.style.height = 'auto';
+    if (isTyping) { isTyping = false; try { await secureSend({ type: 'stop-typing' }); } catch(e){} }
+  }
+
+  function appendMsg(text, dir, msgId) {
+    const area = document.getElementById('msgs');
+    const typingWrap = document.getElementById('typing-wrap');
+    const now  = new Date();
+    const t    = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    const senderName = dir === 'out' ? (activeMyName || 'You') : (document.getElementById('chat-peer-name').textContent || 'Peer');
+    const row  = document.createElement('div');
+    row.className = 'msg-row ' + dir;
+    const dotsHtml = dir === 'out' && msgId
+      ? `<span class="msg-dots" id="dots-${msgId}"><span class="msg-dot filled"></span><span class="msg-dot"></span></span>`
+      : '';
+    if (msgId) row.dataset.msgId = msgId;
+    row.innerHTML = `<div class="bubble">${esc(text)}</div><div class="msg-meta">${senderName} · ${t}${dotsHtml ? ' ' + dotsHtml : ''}</div>`;
+    // Insert before typing indicator so it always stays at bottom
+    area.insertBefore(row, typingWrap);
+    area.scrollTop = area.scrollHeight;
+  }
+
+  function addSysMsg(text) {
+    const area = document.getElementById('msgs');
+    const el   = document.createElement('div');
+    el.className = 'sys-msg'; el.textContent = text;
+    area.appendChild(el); area.scrollTop = area.scrollHeight;
+  }
+
+  function handleTyping() {
+    const inp = document.getElementById('msg-inp');
+    inp.style.height = 'auto';
+    inp.style.height = Math.min(inp.scrollHeight, 120) + 'px';
+    if (!conn) return;
+    if (!isTyping) { isTyping = true; secureSend({ type: 'typing' }).catch(()=>{}); }
+    clearTimeout(typingTO);
+    typingTO = setTimeout(() => {
+      isTyping = false; secureSend({ type: 'stop-typing' }).catch(()=>{});
+    }, 1500);
+  }
+
+  function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
+  function showTyping() {
+    const wrap = document.getElementById('typing-wrap');
+    const area = document.getElementById('msgs');
+    wrap.classList.add('visible');
+    // Move typing indicator to bottom of stream
+    area.appendChild(wrap);
+    area.scrollTop = area.scrollHeight;
+  }
+  function hideTyping() {
+    document.getElementById('typing-wrap').classList.remove('visible');
+  }
+
+  // ─────────────────────────────────────────
+  //  DISCONNECT
+  // ─────────────────────────────────────────
+  function disconnect() {
+    if (conn) {
+      secureSend({ type: 'disconnect' }).catch(()=>{}).finally(() => {
+        try { conn.close(); } catch(e){}
+        conn = null;
+      });
+    }
+    if (roomPeer && !roomPeer.destroyed) { try { roomPeer.destroy(); } catch(e){} roomPeer = null; }
+    resetToLanding();
+  }
+
+  function handleRemoteDisc() {
+    if (document.getElementById('chat-screen').style.display === 'none') return;
+    addSysMsg('— Peer disconnected · Session destroyed · All messages gone —');
+    hideTyping(); conn = null;
+    setTimeout(() => {
+      if (roomPeer && !roomPeer.destroyed) { try { roomPeer.destroy(); } catch(e){} roomPeer = null; }
+      resetToLanding();
+    }, 3000);
+  }
+
+  function resetToLanding() {
+    conn = null; activeMode = null; activeRoomName = null; activeMyName = null; activeRoomPass = null;
+    sharedAESKey = null; e2eReady = false;
+    const badge = document.getElementById('e2e-badge');
+    if (badge) badge.style.display = 'none';
+    stopSessionTimer();
+    stopConnQuality();
+    document.getElementById('chat-screen').style.display    = 'none';
+    document.getElementById('waiting-screen').style.display = 'none';
+    document.getElementById('landing').style.display        = 'flex';
+    document.getElementById('quick-peer-input').value = '';
+    document.getElementById('quick-connect-btn').disabled = false;
+    document.getElementById('create-room-btn').disabled = false;
+    document.getElementById('join-room-btn').disabled   = false;
+    setStatus('quick',  'ready', 'Ready — share your ID');
+    setStatus('create', 'ready', 'Ready');
+    setStatus('join',   'ready', 'Ready');
+  }
+
+  // ─────────────────────────────────────────
+  //  SESSION TIMER + CONNECTION QUALITY
+  // ─────────────────────────────────────────
+  let sessionTimerInterval = null;
+  let sessionStartTime     = null;
+  let connQualityInterval  = null;
+
+  function startSessionTimer() {
+    sessionStartTime = Date.now();
+    const timerEl = document.getElementById('session-timer');
+    if (!timerEl) return;
+    sessionTimerInterval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+      const m = Math.floor(elapsed / 60).toString().padStart(2, '0');
+      const s = (elapsed % 60).toString().padStart(2, '0');
+      timerEl.textContent = m + ':' + s;
+    }, 1000);
+  }
+
+  function stopSessionTimer() {
+    clearInterval(sessionTimerInterval);
+    sessionTimerInterval = null;
+    const timerEl = document.getElementById('session-timer');
+    if (timerEl) timerEl.textContent = '00:00';
+  }
+
+  function startConnQuality() {
+    const bars  = document.getElementById('conn-bars');
+    const label = document.getElementById('conn-label');
+    if (!bars || !label) return;
+    // Use RTT-like heuristic: ping via data channel
+    let lastPingTime = Date.now();
+    let quality = 'good';
+
+    function updateQuality(rtt) {
+      bars.className = 'conn-bars';
+      if (rtt < 120) {
+        quality = 'good'; bars.classList.add('quality-good'); label.textContent = 'Good';
+        label.style.color = 'var(--green)';
+      } else if (rtt < 400) {
+        quality = 'ok'; bars.classList.add('quality-ok'); label.textContent = 'Fair';
+        label.style.color = 'var(--yellow)';
+      } else {
+        quality = 'weak'; bars.classList.add('quality-weak'); label.textContent = 'Weak';
+        label.style.color = 'var(--red)';
+      }
+    }
+
+    // Initial: assume good, then measure via RTCPeerConnection stats if available
+    updateQuality(50);
+
+    connQualityInterval = setInterval(async () => {
+      try {
+        // Try to get RTT from WebRTC stats
+        const pc = conn?.peerConnection;
+        if (pc) {
+          const stats = await pc.getStats();
+          stats.forEach(report => {
+            if (report.type === 'candidate-pair' && report.state === 'succeeded' && report.currentRoundTripTime) {
+              updateQuality(report.currentRoundTripTime * 1000);
+            }
+          });
+        }
+      } catch(e) {}
+    }, 3000);
+  }
+
+  function stopConnQuality() {
+    clearInterval(connQualityInterval);
+    connQualityInterval = null;
+    const bars  = document.getElementById('conn-bars');
+    const label = document.getElementById('conn-label');
+    if (bars)  { bars.className = 'conn-bars'; }
+    if (label) { label.textContent = 'Good'; label.style.color = ''; }
+  }
+  function setStatus(tab, type, text) {
+    const pill  = document.getElementById(tab + '-status');
+    const label = document.getElementById(tab + '-status-text');
+    if (!pill || !label) return;
+    pill.className = 'status-pill ' + type;
+    label.textContent = text;
+    const dot = pill.querySelector('.dot');
+    if (dot) dot.classList.toggle('pulse', type === 'pending' || type === 'info');
+  }
+
+  function copyQuickId() {
+    if (!quickMyId) return;
+    copyToClipboard(quickMyId, 'copy-quick-btn', 'COPY');
+  }
+
+  // ─────────────────────────────────────────
+  //  FILE / PHOTO SHARING
+  // ─────────────────────────────────────────
+  const CHUNK_SIZE   = 16 * 1024; // 16KB per chunk
+  const MAX_FILE_MB  = 25;
+  let   incomingFiles = {}; // keyed by fileId
+
+  function openFilePicker() {
+    if (!conn) return;
+    document.getElementById('file-input').click();
+  }
+
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    e.target.value = ''; // reset so same file can be re-selected
+    if (!file) return;
+
+    const mb = file.size / (1024 * 1024);
+    if (mb > MAX_FILE_MB) {
+      addSysMsg(`— File too large (${mb.toFixed(1)}MB) · Max is ${MAX_FILE_MB}MB —`);
+      return;
+    }
+
+    const fileId   = Date.now() + '-' + Math.random().toString(36).slice(2);
+    const isImage  = file.type.startsWith('image/');
+    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+    // Show sending progress in our own chat
+    const progressEl = appendFileProgress(file.name, formatBytes(file.size), fileId, 'out');
+
+    // Send metadata first (encrypted)
+    secureSend({ type: 'file-meta', fileId, name: file.name, size: file.size, mime: file.type, totalChunks });
+
+    // Read and chunk
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onload = () => {
+      const buf    = reader.result;
+      let   offset = 0;
+      let   index  = 0;
+
+      function sendNextChunk() {
+        if (offset >= buf.byteLength) {
+          secureSend({ type: 'file-end', fileId });
+          // Update sender UI to done
+          updateProgress(fileId, 100, 'Sent ✓');
+          return;
+        }
+        const chunk = buf.slice(offset, offset + CHUNK_SIZE);
+        // Chunks are binary ArrayBuffers — sent directly over DTLS-secured channel
+        conn.send({ type: 'file-chunk', fileId, index, chunk });
+        offset += CHUNK_SIZE;
+        index++;
+        const pct = Math.min(100, Math.round(offset / buf.byteLength * 100));
+        updateProgress(fileId, pct, `Sending ${pct}%`);
+        // Small timeout to avoid flooding the channel
+        setTimeout(sendNextChunk, 8);
+      }
+      sendNextChunk();
+    };
+  }
+
+  // ── Receiving ──
+  function handleIncomingFileData(d) {
+    if (d.type === 'file-meta') {
+      incomingFiles[d.fileId] = {
+        name: d.name, size: d.size, mime: d.mime,
+        totalChunks: d.totalChunks, chunks: [], received: 0
+      };
+      appendFileProgress(d.name, formatBytes(d.size), d.fileId, 'in');
+    }
+    else if (d.type === 'file-chunk') {
+      const f = incomingFiles[d.fileId];
+      if (!f) return;
+      f.chunks[d.index] = d.chunk;
+      f.received++;
+      const pct = Math.round(f.received / f.totalChunks * 100);
+      updateProgress(d.fileId, pct, `Receiving ${pct}%`);
+    }
+    else if (d.type === 'file-end') {
+      const f = incomingFiles[d.fileId];
+      if (!f) return;
+      // Reassemble
+      const blob    = new Blob(f.chunks, { type: f.mime });
+      const url     = URL.createObjectURL(blob);
+      const isImage = f.mime.startsWith('image/');
+      // Replace progress row with actual file/image
+      replaceProgressWithFile(d.fileId, f.name, f.size, f.mime, url, isImage, 'in');
+      delete incomingFiles[d.fileId];
+    }
+  }
+
+  // ── UI helpers ──
+  function appendFileProgress(name, sizeStr, fileId, dir) {
+    const area = document.getElementById('msgs');
+    const now  = new Date();
+    const t    = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    const senderName = dir === 'out' ? (activeMyName || 'You') : (document.getElementById('chat-peer-name').textContent || 'Peer');
+
+    const row = document.createElement('div');
+    row.className = 'msg-row ' + dir;
+    row.id = 'file-row-' + fileId;
+    row.innerHTML = `
+      <div class="file-card" style="cursor:default;">
+        <div class="file-icon">${getFileEmoji(name)}</div>
+        <div class="file-info">
+          <div class="file-name">${esc(name)}</div>
+          <div class="file-size">${sizeStr}</div>
+        </div>
+      </div>
+      <div class="transfer-wrap" id="progress-wrap-${fileId}">
+        <div class="transfer-bar-bg"><div class="transfer-bar" id="bar-${fileId}" style="width:0%"></div></div>
+        <div class="transfer-label" id="label-${fileId}">Preparing...</div>
+      </div>
+      <div class="msg-meta">${senderName} · ${t}</div>`;
+    area.appendChild(row);
+    area.scrollTop = area.scrollHeight;
+    return row;
+  }
+
+  function updateProgress(fileId, pct, label) {
+    const bar   = document.getElementById('bar-' + fileId);
+    const lbl   = document.getElementById('label-' + fileId);
+    if (bar) bar.style.width = pct + '%';
+    if (lbl) lbl.textContent = label;
+  }
+
+  function replaceProgressWithFile(fileId, name, size, mime, url, isImage, dir) {
+    const row = document.getElementById('file-row-' + fileId);
+    if (!row) return;
+    const now  = new Date();
+    const t    = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    const senderName = dir === 'out' ? (activeMyName || 'You') : (document.getElementById('chat-peer-name').textContent || 'Peer');
+
+    if (isImage) {
+      row.innerHTML = `
+        <img class="bubble-img" src="${url}" alt="${esc(name)}" onclick="openLightbox('${url}')"/>
+        <div class="msg-meta">${senderName} · ${t} · <a href="${url}" download="${esc(name)}" style="color:var(--accent);text-decoration:none;" onclick="event.stopPropagation()">↓ save</a></div>`;
+    } else {
+      row.innerHTML = `
+        <a class="file-card" href="${url}" download="${esc(name)}">
+          <div class="file-icon">${getFileEmoji(name)}</div>
+          <div class="file-info">
+            <div class="file-name">${esc(name)}</div>
+            <div class="file-size">${formatBytes(size)} · click to download</div>
+          </div>
+        </a>
+        <div class="msg-meta">${senderName} · ${t}</div>`;
+    }
+    document.getElementById('msgs').scrollTop = 99999;
+  }
+
+  function getFileEmoji(name) {
+    const ext = name.split('.').pop().toLowerCase();
+    const map = { jpg:'🖼️', jpeg:'🖼️', png:'🖼️', gif:'🖼️', webp:'🖼️', svg:'🖼️',
+                  pdf:'📄', doc:'📝', docx:'📝', txt:'📝',
+                  xls:'📊', xlsx:'📊', csv:'📊',
+                  ppt:'📊', pptx:'📊',
+                  mp3:'🎵', wav:'🎵', ogg:'🎵',
+                  mp4:'🎬', mov:'🎬', avi:'🎬',
+                  zip:'📦', rar:'📦', tar:'📦', gz:'📦' };
+    return map[ext] || '📎';
+  }
+
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/1024/1024).toFixed(1) + ' MB';
+  }
+
+  // ── Lightbox ──
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+
+  boot();
+
+  // Auto-detect invite link in URL
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const joinParam = params.get('join');
+    if (joinParam) {
+      const fullLink = window.location.href;
+      switchTab(1);
+      switchSubTab('join');
+      switchJoinMethod('link');
+      document.getElementById('join-link').value = fullLink;
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  })();
+</script>
+</body>
+</html>
