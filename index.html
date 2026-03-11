@@ -135,6 +135,18 @@
     }
     .tab:hover { color: var(--text); background: rgba(255,255,255,0.03); }
     .tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+    .tab.active.tab-green { color: var(--green); border-bottom-color: var(--green); }
+
+    /* Private Room green theme — applied when panel-1 has .green-mode */
+    #panel-1.green-mode .btn.purple { background: #1e6e3c; color: #c6efcc; }
+    #panel-1.green-mode .btn.purple:hover { background: #225e38; filter: brightness(1.1); }
+    #panel-1.green-mode .inp:focus { border-color: rgba(129,201,149,0.5); box-shadow: 0 0 0 2px rgba(129,201,149,0.1); }
+    #panel-1.green-mode .join-toggle-btn.active { color: var(--green); }
+    #panel-1.green-mode .copy-btn { color: var(--green); border-color: rgba(129,201,149,0.3); }
+    #panel-1.green-mode .copy-btn:hover { background: rgba(129,201,149,0.1); border-color: rgba(129,201,149,0.5); }
+    #panel-1.green-mode .copy-btn.copied { color: var(--green); border-color: rgba(129,201,149,0.35); background: rgba(129,201,149,0.08); }
+    #panel-1.green-mode .invite-box { border-color: rgba(129,201,149,0.2); }
+    #panel-1.green-mode .invite-link-text { color: var(--green); }
 
     /* Tab panels */
     .tab-panel { display: none; flex-direction: column; gap: 18px; }
@@ -550,20 +562,110 @@
     #lightbox-close svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; }
 
     /* ══════════════════════════════════════
-       RESPONSIVE
+       RESPONSIVE — MOBILE
     ══════════════════════════════════════ */
     @media (max-width: 768px) {
-      #landing { flex-direction: column; overflow-y: auto; height: auto; min-height: 100vh; }
-      .landing-left { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 32px 24px 24px; }
+      /* Landing */
+      #landing {
+        flex-direction: column;
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+        max-width: 100%;
+      }
+      .landing-left {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 28px 20px 20px;
+      }
+      .logo-title { font-size: 1.6rem; }
       .feature-list { display: none; }
-      .landing-right { padding: 28px 24px 36px; }
-      #chat-screen { flex-direction: column; }
-      .chat-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; }
-      .sidebar-info, .sidebar-footer { display: none; }
-      .sidebar-header { flex: 1; border-bottom: none; padding: 12px 16px; }
-      .msgs { padding: 14px 16px; }
-      .chat-foot { padding: 10px 16px 16px; }
-      .bubble { max-width: 85%; }
+      .left-footer { padding-top: 16px; }
+      .landing-right { padding: 24px 20px 40px; }
+      .right-title { font-size: 1.2rem; }
+      .tab { font-size: 0.8rem; padding: 10px 10px; }
+
+      /* Waiting screen */
+      .waiting-inner { padding: 36px 20px; }
+      .share-box { padding: 16px 18px; }
+
+      /* Chat screen — stacked layout */
+      #chat-screen {
+        flex-direction: column;
+        max-width: 100%;
+      }
+
+      /* Sidebar becomes a slim topbar strip */
+      .chat-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        flex-direction: row;
+        align-items: center;
+        padding: 0;
+        background: var(--surface);
+        flex-shrink: 0;
+      }
+      .sidebar-header {
+        flex: 1;
+        border-bottom: none;
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .sidebar-logo { margin-bottom: 0; }
+      .sidebar-logo-text { font-size: 0.9rem; }
+      .sidebar-info { display: none; }
+      .sidebar-footer { display: none; }
+
+      /* Show a compact peer name + end button in sidebar header on mobile */
+      .sidebar-header::after {
+        display: none; /* handled via JS-injected topbar */
+      }
+
+      /* Main chat area takes remaining height */
+      .chat-main {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* Topbar — tighter on mobile */
+      .chat-topbar {
+        padding: 10px 14px;
+      }
+      .topbar-name { font-size: 0.84rem; }
+      .topbar-sub  { display: none; }
+      .topbar-av   { width: 30px; height: 30px; font-size: 0.75rem; }
+      .live-badge  { display: none; }
+      .topbar-end-btn { padding: 6px 10px; font-size: 0.78rem; }
+      .topbar-end-btn span.end-label { display: none; }
+
+      /* Messages */
+      .msgs { padding: 12px 14px; gap: 2px; }
+      .bubble { max-width: 88%; font-size: 0.85rem; padding: 9px 12px; }
+      .bubble-img { max-width: 220px; max-height: 180px; }
+      .file-card { max-width: 240px; }
+
+      /* Input area */
+      .chat-foot { padding: 8px 12px 20px; }
+      .msg-inp { font-size: 0.88rem; padding: 10px 14px; }
+      .attach-btn, .send-btn { width: 38px; height: 38px; }
+    }
+
+    /* Extra small — phones under 400px */
+    @media (max-width: 400px) {
+      .landing-left  { padding: 22px 16px 16px; }
+      .landing-right { padding: 20px 16px 32px; }
+      .right-title   { font-size: 1.1rem; }
+      .btn           { font-size: 0.85rem; padding: 10px 16px; }
+      .inp           { font-size: 0.85rem; }
+      .bubble        { max-width: 92%; }
+      .tab           { font-size: 0.75rem; padding: 9px 6px; }
     }
   </style>
 </head>
@@ -885,7 +987,7 @@
   </div>
 
   <!-- Hidden file input -->
-  <input type="file" id="file-input" accept="image/*,.pdf,.txt,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.mp3,.mp4,.mov" style="display:none;" onchange="handleFileSelect(event)"/>
+  <input type="file" id="file-input" accept="*/*" style="display:none;" onchange="handleFileSelect(event)"/>
 
 </div>
 
@@ -903,6 +1005,12 @@
   let activeRoomPass = null;
   let typingTO     = null;
   let isTyping     = false;
+
+  // Reconnection state
+  let reconnectAttempts = 0;
+  let reconnectTO       = null;
+  let reconnectTarget   = null;   // { peerId, myName, password, mode }
+  const MAX_RECONNECT   = 5;
 
   // ─────────────────────────────────────────
   //  E2E ENCRYPTION  (ECDH + AES-256-GCM)
@@ -992,9 +1100,9 @@
   //  HELPERS
   // ─────────────────────────────────────────
   function genId() {
-    const adj  = ['dark','void','null','zero','ghost','echo','flux','neon','byte','silk','haze','drift','nova','blur','arc'];
-    const noun = ['wolf','hawk','fox','crow','lynx','vibe','node','pulse','core','wave','rift','sync','beam','grid','peak'];
-    return adj[~~(Math.random()*adj.length)] + '-' + noun[~~(Math.random()*noun.length)] + '-' + (~~(Math.random()*900)+100);
+    const bytes = crypto.getRandomValues(new Uint8Array(6));
+    const hex = Array.from(bytes).map(b => b.toString(16).padStart(2,'0')).join('');
+    return `${hex.slice(0,4)}-${hex.slice(4,8)}-${hex.slice(8,12)}`;
   }
   function cleanRoom(s) {
     return s.toLowerCase().trim().replace(/[^a-z0-9\-_]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'').slice(0,40);
@@ -1055,8 +1163,19 @@
   //  TABS
   // ─────────────────────────────────────────
   function switchTab(i) {
-    document.querySelectorAll('.tab').forEach((t,j)       => t.classList.toggle('active', i===j));
+    document.querySelectorAll('.tab').forEach((t,j) => {
+      t.classList.toggle('active', i===j);
+      t.classList.remove('tab-green');
+    });
     document.querySelectorAll('.tab-panel').forEach((p,j) => p.classList.toggle('active', i===j));
+    // Tab 1 = Private Room → green theme
+    if (i === 1) {
+      const privatTab = document.querySelectorAll('.tab')[1];
+      if (privatTab) privatTab.classList.add('tab-green');
+      document.getElementById('panel-1').classList.add('green-mode');
+    } else {
+      document.getElementById('panel-1').classList.remove('green-mode');
+    }
   }
 
   // ─────────────────────────────────────────
@@ -1272,6 +1391,8 @@
       setupConn();
       conn.on('open', () => {
         activeMode = 'room';
+        reconnectTarget   = { peerId: roomHostId, myName, password, mode: 'room' };
+        reconnectAttempts = 0;
         showChat('room', 'Connecting...', myName);
         try { conn.send({ type: 'hello', name: myName, pubkey: myPublicKeyB64 }); } catch(e){}
       });
@@ -1507,8 +1628,12 @@
   function showTyping() {
     const wrap = document.getElementById('typing-wrap');
     const area = document.getElementById('msgs');
+    const nameLabel = document.getElementById('typing-name-label');
+    if (nameLabel) {
+      const peerName = document.getElementById('chat-peer-name')?.textContent || 'Peer';
+      nameLabel.textContent = peerName + ' is typing…';
+    }
     wrap.classList.add('visible');
-    // Move typing indicator to bottom of stream
     area.appendChild(wrap);
     area.scrollTop = area.scrollHeight;
   }
@@ -1520,6 +1645,10 @@
   //  DISCONNECT
   // ─────────────────────────────────────────
   function disconnect() {
+    clearTimeout(reconnectTO);
+    reconnectTarget   = null;
+    reconnectAttempts = 0;
+    hideReconnectBanner();
     if (conn) {
       secureSend({ type: 'disconnect' }).catch(()=>{}).finally(() => {
         try { conn.close(); } catch(e){}
@@ -1532,17 +1661,114 @@
 
   function handleRemoteDisc() {
     if (document.getElementById('chat-screen').style.display === 'none') return;
-    addSysMsg('— Peer disconnected · Session destroyed · All messages gone —');
     hideTyping(); conn = null;
-    setTimeout(() => {
-      if (roomPeer && !roomPeer.destroyed) { try { roomPeer.destroy(); } catch(e){} roomPeer = null; }
-      resetToLanding();
-    }, 3000);
+
+    // If we have a reconnect target and haven't exhausted retries, try to reconnect
+    if (reconnectTarget && reconnectAttempts < MAX_RECONNECT) {
+      reconnectAttempts++;
+      showReconnectBanner(reconnectAttempts, MAX_RECONNECT);
+      reconnectTO = setTimeout(() => attemptReconnect(), 2500);
+    } else {
+      hideReconnectBanner();
+      addSysMsg('— Peer disconnected · Session destroyed · All messages gone —');
+      setTimeout(() => {
+        if (roomPeer && !roomPeer.destroyed) { try { roomPeer.destroy(); } catch(e){} roomPeer = null; }
+        resetToLanding();
+      }, 3000);
+    }
+  }
+
+  function attemptReconnect() {
+    if (!reconnectTarget) return;
+    const { peerId, myName, password, mode } = reconnectTarget;
+    addSysMsg(`— Reconnecting… attempt ${reconnectAttempts}/${MAX_RECONNECT} —`);
+
+    if (roomPeer && !roomPeer.destroyed) { try { roomPeer.destroy(); } catch(e){} roomPeer = null; }
+
+    const guestId = genId() + '-r';
+    roomPeer = new Peer(guestId, {
+      host: '0.peerjs.com', port: 443, secure: true, path: '/',
+      config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }
+    });
+
+    roomPeer.on('open', () => {
+      conn = roomPeer.connect(peerId, { reliable: true, metadata: { name: myName, password } });
+      setupConn();
+      conn.on('open', () => {
+        // Restore E2E
+        initCrypto().then(() => {
+          hideReconnectBanner();
+          reconnectAttempts = 0;
+          addSysMsg('— Reconnected · End-to-end encryption re-establishing… —');
+          try { conn.send({ type: 'hello', name: myName, pubkey: myPublicKeyB64 }); } catch(e){}
+        });
+      });
+      conn.on('error', () => {
+        if (reconnectAttempts < MAX_RECONNECT) {
+          reconnectAttempts++;
+          showReconnectBanner(reconnectAttempts, MAX_RECONNECT);
+          reconnectTO = setTimeout(() => attemptReconnect(), 2500);
+        } else {
+          hideReconnectBanner();
+          addSysMsg('— Could not reconnect · Session ended —');
+          setTimeout(() => resetToLanding(), 2500);
+        }
+      });
+    });
+
+    roomPeer.on('error', () => {
+      if (reconnectAttempts < MAX_RECONNECT) {
+        reconnectAttempts++;
+        showReconnectBanner(reconnectAttempts, MAX_RECONNECT);
+        reconnectTO = setTimeout(() => attemptReconnect(), 2500);
+      } else {
+        hideReconnectBanner();
+        addSysMsg('— Could not reconnect · Session ended —');
+        setTimeout(() => resetToLanding(), 2500);
+      }
+    });
+  }
+
+  function showReconnectBanner(attempt, max) {
+    let banner = document.getElementById('reconnect-banner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'reconnect-banner';
+      banner.style.cssText = `
+        position:fixed; top:0; left:0; right:0; z-index:999;
+        background: rgba(253,214,99,0.1); border-bottom: 1px solid rgba(253,214,99,0.3);
+        padding: 10px 20px; display:flex; align-items:center; justify-content:space-between;
+        backdrop-filter: blur(10px); animation: fadeUp 0.3s ease;
+      `;
+      document.body.appendChild(banner);
+    }
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--yellow);animation:dotPulse 1.2s infinite;"></div>
+        <span style="font-size:0.82rem;color:var(--yellow);font-weight:500;">Connection lost — reconnecting (${attempt}/${max})…</span>
+      </div>
+      <button onclick="abortReconnect()" style="background:transparent;border:1px solid rgba(253,214,99,0.3);border-radius:6px;padding:4px 12px;color:var(--yellow);font-size:0.75rem;cursor:pointer;">Give up</button>
+    `;
+  }
+
+  function hideReconnectBanner() {
+    const b = document.getElementById('reconnect-banner');
+    if (b) b.remove();
+  }
+
+  function abortReconnect() {
+    clearTimeout(reconnectTO);
+    reconnectTarget   = null;
+    reconnectAttempts = 0;
+    hideReconnectBanner();
+    addSysMsg('— Reconnection cancelled · Session ended —');
+    setTimeout(() => resetToLanding(), 2000);
   }
 
   function resetToLanding() {
     conn = null; activeMode = null; activeRoomName = null; activeMyName = null; activeRoomPass = null;
     sharedAESKey = null; e2eReady = false;
+    reconnectTarget = null; reconnectAttempts = 0; clearTimeout(reconnectTO); hideReconnectBanner();
     const badge = document.getElementById('e2e-badge');
     if (badge) badge.style.display = 'none';
     stopSessionTimer();
@@ -1652,8 +1878,8 @@
   // ─────────────────────────────────────────
   //  FILE / PHOTO SHARING
   // ─────────────────────────────────────────
-  const CHUNK_SIZE   = 16 * 1024; // 16KB per chunk
-  const MAX_FILE_MB  = 25;
+  const CHUNK_SIZE   = 64 * 1024; // 64KB per chunk — faster throughput
+  const MAX_FILE_MB  = 200;
   let   incomingFiles = {}; // keyed by fileId
 
   function openFilePicker() {
