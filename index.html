@@ -562,6 +562,133 @@
     #lightbox-close svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; }
 
     /* ══════════════════════════════════════
+       CALL BUTTONS IN TOPBAR
+    ══════════════════════════════════════ */
+    .call-btn {
+      width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border);
+      background: var(--surface2); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.15s; color: var(--text2); flex-shrink: 0;
+    }
+    .call-btn:hover { border-color: rgba(129,201,149,0.4); color: var(--green); background: rgba(129,201,149,0.07); }
+    .call-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .call-btn.active { background: rgba(129,201,149,0.12); border-color: rgba(129,201,149,0.5); color: var(--green); }
+
+    /* ══════════════════════════════════════
+       INCOMING CALL BANNER
+    ══════════════════════════════════════ */
+    #incoming-call-banner {
+      display: none; position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+      background: var(--surface); border: 1px solid rgba(129,201,149,0.3); border-radius: 16px;
+      padding: 16px 22px; z-index: 8000; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      animation: fadeUp 0.3s ease both; min-width: 280px;
+    }
+    #incoming-call-banner.visible { display: flex; align-items: center; gap: 16px; }
+    .inc-call-info { flex: 1; }
+    .inc-call-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .inc-call-sub { font-size: 0.75rem; color: var(--text2); }
+    .inc-call-ring { width: 42px; height: 42px; border-radius: 50%; background: rgba(129,201,149,0.12); border: 1px solid rgba(129,201,149,0.3); display: flex; align-items: center; justify-content: center; animation: ringPulse 1.5s infinite; }
+    .inc-call-ring svg { width: 18px; height: 18px; fill: none; stroke: var(--green); stroke-width: 2; stroke-linecap: round; }
+    .inc-accept { background: var(--green); color: #0d1f15; border: none; border-radius: 8px; padding: 8px 16px; font-family: 'Google Sans', sans-serif; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .inc-accept:hover { filter: brightness(1.1); }
+    .inc-decline { background: rgba(242,139,130,0.1); color: var(--red); border: 1px solid rgba(242,139,130,0.3); border-radius: 8px; padding: 8px 16px; font-family: 'Google Sans', sans-serif; font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .inc-decline:hover { background: rgba(242,139,130,0.18); }
+
+    /* ══════════════════════════════════════
+       CALL OVERLAY
+    ══════════════════════════════════════ */
+    #call-overlay {
+      display: none; position: fixed; inset: 0; background: #080a10; z-index: 9000;
+      flex-direction: column; align-items: center; justify-content: center;
+      animation: fadeUp 0.3s ease both;
+    }
+    #call-overlay.visible { display: flex; }
+
+    /* Remote video fills screen */
+    #remote-video {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; background: #080a10;
+    }
+    /* Audio-only placeholder */
+    #audio-avatar {
+      display: none; flex-direction: column; align-items: center; gap: 20px;
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 1;
+    }
+    #audio-avatar.visible { display: flex; }
+    .audio-av-ring {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: var(--surface2); border: 2px solid rgba(129,201,149,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Google Sans', sans-serif; font-size: 2.5rem; font-weight: 700; color: var(--text);
+      animation: ringPulse 2s infinite;
+    }
+    .audio-call-name { font-family: 'Google Sans', sans-serif; font-size: 1.2rem; font-weight: 600; color: var(--text); }
+    .audio-call-status { font-size: 0.82rem; color: var(--text2); }
+
+    /* Local video PiP */
+    #local-video {
+      position: absolute; top: 20px; right: 20px; width: 130px; height: 100px;
+      border-radius: 12px; object-fit: cover; background: var(--surface2);
+      border: 2px solid rgba(255,255,255,0.12); z-index: 2; cursor: pointer;
+      transition: all 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    #local-video:hover { transform: scale(1.03); }
+    #local-video.hidden { display: none; }
+
+    /* Call header */
+    .call-header {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+      padding: 20px 24px; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .call-peer-name { font-family: 'Google Sans', sans-serif; font-size: 1rem; font-weight: 600; color: #fff; }
+    .call-timer { font-family: 'Roboto Mono', monospace; font-size: 0.82rem; color: rgba(255,255,255,0.6); margin-left: auto; }
+    .call-type-badge { font-size: 0.72rem; color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 2px 8px; }
+
+    /* Call controls bar */
+    .call-controls {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+      padding: 24px 24px 36px;
+      background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+      display: flex; align-items: center; justify-content: center; gap: 16px;
+    }
+    .ctrl-btn {
+      width: 54px; height: 54px; border-radius: 50%; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+      backdrop-filter: blur(8px);
+    }
+    .ctrl-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .ctrl-btn.toggle { background: rgba(255,255,255,0.12); color: #fff; }
+    .ctrl-btn.toggle:hover { background: rgba(255,255,255,0.2); }
+    .ctrl-btn.toggle.muted { background: rgba(242,139,130,0.2); color: var(--red); }
+    .ctrl-btn.end-call { background: var(--red); color: #fff; width: 64px; height: 64px; }
+    .ctrl-btn.end-call:hover { filter: brightness(1.15); transform: scale(1.05); }
+    .ctrl-btn.end-call svg { width: 22px; height: 22px; }
+    .ctrl-label { font-size: 0.65rem; color: rgba(255,255,255,0.5); margin-top: 6px; font-weight: 500; letter-spacing: 0.3px; }
+    .ctrl-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+    /* Outgoing call screen */
+    #outgoing-call-screen {
+      display: none; position: fixed; inset: 0; background: #080a10; z-index: 8500;
+      flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+      animation: fadeUp 0.3s ease both;
+    }
+    #outgoing-call-screen.visible { display: flex; }
+    .outgoing-av {
+      width: 90px; height: 90px; border-radius: 50%; background: var(--surface2);
+      border: 2px solid rgba(138,180,248,0.3); display: flex; align-items: center; justify-content: center;
+      font-family: 'Google Sans', sans-serif; font-size: 2.2rem; font-weight: 700; color: var(--text);
+      animation: ringPulse 2s infinite;
+    }
+    .outgoing-name { font-family: 'Google Sans', sans-serif; font-size: 1.3rem; font-weight: 600; color: var(--text); }
+    .outgoing-sub { font-size: 0.84rem; color: var(--text2); }
+    .cancel-call-btn {
+      background: rgba(242,139,130,0.1); border: 1px solid rgba(242,139,130,0.3); border-radius: 100px;
+      padding: 10px 28px; color: var(--red); font-family: 'Google Sans', sans-serif;
+      font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.15s; margin-top: 12px;
+    }
+    .cancel-call-btn:hover { background: rgba(242,139,130,0.18); }
+
+    /* ══════════════════════════════════════
        RESPONSIVE — MOBILE
     ══════════════════════════════════════ */
     @media (max-width: 768px) {
@@ -644,6 +771,17 @@
       .live-badge  { display: none; }
       .topbar-end-btn { padding: 6px 10px; font-size: 0.78rem; }
       .topbar-end-btn span.end-label { display: none; }
+      .call-btn { width: 32px; height: 32px; }
+      .call-btn svg { width: 13px; height: 13px; }
+      #incoming-call-banner {
+        bottom: 80px; left: 12px; right: 12px;
+        transform: none; min-width: unset; width: auto;
+        flex-wrap: wrap; gap: 10px; padding: 14px 16px;
+      }
+      #local-video { width: 90px; height: 70px; top: 12px; right: 12px; }
+      .ctrl-btn { width: 48px; height: 48px; }
+      .ctrl-btn.end-call { width: 56px; height: 56px; }
+      .call-controls { gap: 12px; padding: 16px 16px 28px; }
 
       /* Messages */
       .msgs { padding: 12px 14px; gap: 2px; }
@@ -938,11 +1076,17 @@
             <div class="topbar-sub">no history · no logs · disappears on close</div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
           <div class="live-badge">
             <div class="dot" style="background:var(--green);animation:dotPulse 1.4s infinite;"></div>
             LIVE
           </div>
+          <button class="call-btn" id="voice-call-btn" onclick="startCall('audio')" title="Voice call">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.5 12a19.79 19.79 0 01-3.07-8.67A2 2 0 013.41 1h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.91 8.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+          </button>
+          <button class="call-btn" id="video-call-btn" onclick="startCall('video')" title="Video call">
+            <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          </button>
           <button class="topbar-end-btn" onclick="disconnect()">
             <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
             End
@@ -976,6 +1120,75 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- ══════════ INCOMING CALL BANNER ══════════ -->
+  <div id="incoming-call-banner">
+    <div class="inc-call-ring">
+      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.5 12a19.79 19.79 0 01-3.07-8.67A2 2 0 013.41 1h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.91 8.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+    </div>
+    <div class="inc-call-info">
+      <div class="inc-call-title" id="inc-call-title">Incoming call</div>
+      <div class="inc-call-sub" id="inc-call-sub">Voice call</div>
+    </div>
+    <button class="inc-decline" onclick="declineCall()">Decline</button>
+    <button class="inc-accept" onclick="acceptCall()">Accept</button>
+  </div>
+
+  <!-- ══════════ OUTGOING CALL SCREEN ══════════ -->
+  <div id="outgoing-call-screen">
+    <div class="outgoing-av" id="outgoing-av">?</div>
+    <div class="outgoing-name" id="outgoing-name">Calling...</div>
+    <div class="outgoing-sub" id="outgoing-sub">Waiting for answer…</div>
+    <button class="cancel-call-btn" onclick="cancelCall()">Cancel Call</button>
+  </div>
+
+  <!-- ══════════ ACTIVE CALL OVERLAY ══════════ -->
+  <div id="call-overlay">
+    <video id="remote-video" autoplay playsinline></video>
+    <video id="local-video" autoplay playsinline muted></video>
+
+    <!-- Audio-only avatar (shown when no video) -->
+    <div id="audio-avatar">
+      <div class="audio-av-ring" id="audio-av-ring">?</div>
+      <div class="audio-call-name" id="audio-call-name">—</div>
+      <div class="audio-call-status" id="audio-call-status">Connected</div>
+    </div>
+
+    <!-- Header -->
+    <div class="call-header">
+      <div class="call-peer-name" id="call-peer-name-display">—</div>
+      <span class="call-type-badge" id="call-type-badge">VOICE</span>
+      <div class="call-timer" id="call-timer">00:00</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="call-controls">
+      <div class="ctrl-wrap">
+        <button class="ctrl-btn toggle" id="mic-btn" onclick="toggleMic()" title="Mute/Unmute">
+          <svg id="mic-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+        <span class="ctrl-label" id="mic-label">Mute</span>
+      </div>
+      <div class="ctrl-wrap">
+        <button class="ctrl-btn toggle" id="cam-btn" onclick="toggleCam()" title="Camera on/off" style="display:none;">
+          <svg id="cam-icon" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        </button>
+        <span class="ctrl-label" id="cam-label" style="display:none;">Camera</span>
+      </div>
+      <div class="ctrl-wrap">
+        <button class="ctrl-btn end-call" onclick="endCall()" title="End call">
+          <svg viewBox="0 0 24 24"><path d="M10.68 13.31a16 16 0 003.41 2.6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7 2 2 0 011.72 2v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 2 2 0 01-.31-.24M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 5a10.94 10.94 0 01.29-.29 16 16 0 0121 0 2 2 0 01.45 2.11L7.91 8.91"/></svg>
+        </button>
+        <span class="ctrl-label">End</span>
+      </div>
+      <div class="ctrl-wrap">
+        <button class="ctrl-btn toggle" id="spk-btn" onclick="toggleSpeaker()" title="Speaker">
+          <svg id="spk-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        </button>
+        <span class="ctrl-label">Speaker</span>
+      </div>
+    </div>
   </div>
 
   <!-- Lightbox -->
@@ -1475,9 +1688,14 @@
       else if (d.type === 'stop-typing') { hideTyping(); }
       else if (d.type === 'disconnect')  { handleRemoteDisc(); }
       else if (d.type === 'file-meta' || d.type === 'file-chunk' || d.type === 'file-end') { handleIncomingFileData(d); }
+      else if (d.type === 'call-offer' || d.type === 'call-declined' || d.type === 'call-cancelled' || d.type === 'call-accepted' || d.type === 'call-ended') { handleCallSignal(d); }
     });
     conn.on('close', handleRemoteDisc);
     conn.on('error', handleRemoteDisc);
+
+    // Register media call handler on the peer so caller receives callee's return call
+    const peer = quickPeer || roomPeer;
+    registerMediaCallHandler(peer);
   }
 
   // ─────────────────────────────────────────
@@ -1766,6 +1984,16 @@
   }
 
   function resetToLanding() {
+    // Clean up any active call
+    if (activeCall) { try { activeCall.close(); } catch(e){} activeCall = null; }
+    if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+    document.getElementById('call-overlay').classList.remove('visible');
+    document.getElementById('outgoing-call-screen').classList.remove('visible');
+    document.getElementById('incoming-call-banner').classList.remove('visible');
+    document.getElementById('audio-avatar').classList.remove('visible');
+    stopCallTimer(); resetCallControls();
+    callType = null; pendingCallType = null; callerPeerId = null;
+
     conn = null; activeMode = null; activeRoomName = null; activeMyName = null; activeRoomPass = null;
     sharedAESKey = null; e2eReady = false;
     reconnectTarget = null; reconnectAttempts = 0; clearTimeout(reconnectTO); hideReconnectBanner();
@@ -2054,7 +2282,347 @@
     document.getElementById('lightbox').classList.remove('open');
   }
 
+  // ─────────────────────────────────────────
+  //  VOICE / VIDEO CALLS
+  //  Flow:
+  //    Caller:  startCall() → secureSend('call-offer') → show outgoing screen
+  //             → peer.on('call') fires when callee answers → handleCallStream()
+  //    Callee:  handleCallSignal('call-offer') → show banner
+  //             → acceptCall() → getUserMedia → peer.call(CALLER_PEER_ID, stream)
+  //             → caller's peer.on('call') fires → both get stream
+  // ─────────────────────────────────────────
+  let localStream     = null;
+  let remoteStream    = null;
+  let activeCall      = null;
+  let callType        = null;
+  let callTimerInt    = null;
+  let callStartTime   = null;
+  let micMuted        = false;
+  let camOff          = false;
+  let pendingCallType = null;
+  let callerPeerId    = null;   // peer ID of whoever called us (so callee can call back)
+
+  // Robust getUserMedia with fallbacks and real error messages
+  async function getMediaStream(type) {
+    const constraints = type === 'video'
+      ? { audio: true, video: { facingMode: 'user' } }
+      : { audio: true, video: false };
+
+    try {
+      return await navigator.mediaDevices.getUserMedia(constraints);
+    } catch(e) {
+      // If video failed, try audio-only as fallback for video calls
+      if (type === 'video' && (e.name === 'OverconstrainedError' || e.name === 'NotFoundError' || e.name === 'NotReadableError')) {
+        try {
+          addSysMsg('— Camera unavailable · switching to voice only —');
+          callType = 'audio';
+          return await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        } catch(e2) {
+          throw e2;
+        }
+      }
+      throw e;
+    }
+  }
+
+  function getMediaErrorMsg(e) {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      return '— This browser does not support calls · Try Chrome or Firefox —';
+    }
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+      return '— Calls require HTTPS · Open this page over https:// —';
+    }
+    if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
+      return '— Microphone permission denied · Allow mic access in browser settings —';
+    }
+    if (e.name === 'NotFoundError' || e.name === 'DevicesNotFoundError') {
+      return '— No microphone found · Plug in a mic and try again —';
+    }
+    if (e.name === 'NotReadableError' || e.name === 'TrackStartError') {
+      return '— Mic is being used by another app · Close other apps and retry —';
+    }
+    if (e.name === 'OverconstrainedError') {
+      return '— Camera constraint failed · Retrying with basic settings —';
+    }
+    return '— Could not access microphone: ' + (e.message || e.name) + ' —';
+  }
+  // so the caller can receive the media call from the callee
+  function registerMediaCallHandler(peer) {
+    if (!peer || peer.destroyed) return;
+    peer.off('call');
+    peer.on('call', (call) => {
+      // We are the CALLER — callee is calling us back with their stream
+      if (!activeCall && localStream) {
+        activeCall = call;
+        call.answer(localStream);
+        document.getElementById('outgoing-call-screen').classList.remove('visible');
+        handleCallStream(call, callType || 'audio');
+      }
+    });
+  }
+
+  async function startCall(type) {
+    if (!conn || !conn.open) { addSysMsg('— No active connection —'); return; }
+    if (activeCall) { addSysMsg('— Already in a call —'); return; }
+
+    // Check HTTPS first
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+      addSysMsg('— Calls require HTTPS · Host this page over https:// —');
+      return;
+    }
+
+    callType = type;
+    try {
+      localStream = await getMediaStream(type);
+    } catch(e) {
+      addSysMsg(getMediaErrorMsg(e));
+      localStream = null; callType = null;
+      return;
+    }
+
+    // Signal peer via encrypted data channel
+    await secureSend({ type: 'call-offer', callType: type });
+
+    // Show outgoing screen
+    const peerName = document.getElementById('chat-peer-name').textContent || 'Peer';
+    document.getElementById('outgoing-av').textContent  = peerName[0]?.toUpperCase() || '?';
+    document.getElementById('outgoing-name').textContent = peerName;
+    document.getElementById('outgoing-sub').textContent  = type === 'video' ? '📹 Video calling…' : '📞 Voice calling…';
+    document.getElementById('outgoing-call-screen').classList.add('visible');
+
+    // Register handler to receive callee's return call
+    const peer = quickPeer || roomPeer;
+    registerMediaCallHandler(peer);
+  }
+
+  async function acceptCall() {
+    document.getElementById('incoming-call-banner').classList.remove('visible');
+    const type = pendingCallType || 'audio';
+    callType = type;
+
+    try {
+      localStream = await getMediaStream(type);
+    } catch(e) {
+      addSysMsg(getMediaErrorMsg(e));
+      await secureSend({ type: 'call-declined' });
+      localStream = null; callType = null; pendingCallType = null; callerPeerId = null;
+      return;
+    }
+
+    // Callee calls the CALLER using their actual peer ID
+    const peer = quickPeer || roomPeer;
+    if (!peer || peer.destroyed || !callerPeerId) {
+      addSysMsg('— Could not connect call —');
+      return;
+    }
+
+    activeCall = peer.call(callerPeerId, localStream, { metadata: { callType: type } });
+    if (!activeCall) { addSysMsg('— Call failed —'); return; }
+    handleCallStream(activeCall, type);
+    pendingCallType = null;
+  }
+
+  function declineCall() {
+    document.getElementById('incoming-call-banner').classList.remove('visible');
+    secureSend({ type: 'call-declined' });
+    pendingCallType = null; callerPeerId = null;
+    if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+  }
+
+  function cancelCall() {
+    document.getElementById('outgoing-call-screen').classList.remove('visible');
+    secureSend({ type: 'call-cancelled' });
+    if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+    activeCall = null; callType = null;
+  }
+
+  function handleCallStream(call, type) {
+    call.on('stream', (stream) => {
+      remoteStream = stream;
+
+      const remoteVid = document.getElementById('remote-video');
+      const localVid  = document.getElementById('local-video');
+      remoteVid.srcObject = stream;
+
+      if (type === 'video' && localStream) {
+        localVid.srcObject = localStream;
+        localVid.classList.remove('hidden');
+        document.getElementById('cam-btn').style.display = '';
+        document.getElementById('cam-label').style.display = '';
+        document.getElementById('call-type-badge').textContent = 'VIDEO';
+      } else {
+        localVid.classList.add('hidden');
+        const pn = document.getElementById('chat-peer-name').textContent || '?';
+        document.getElementById('audio-av-ring').textContent = pn[0]?.toUpperCase() || '?';
+        document.getElementById('audio-call-name').textContent = pn;
+        document.getElementById('audio-avatar').classList.add('visible');
+        document.getElementById('call-type-badge').textContent = 'VOICE';
+      }
+
+      showCallOverlay(type);
+      startCallTimer();
+    });
+
+    call.on('close', () => { endCall(true); });
+    call.on('error', (err) => { console.error('Call error:', err); endCall(true); });
+  }
+
+  function showCallOverlay(type) {
+    const peerName = document.getElementById('chat-peer-name').textContent || '—';
+    document.getElementById('call-peer-name-display').textContent = peerName;
+    document.getElementById('audio-call-name').textContent = peerName;
+    document.getElementById('audio-av-ring').textContent = peerName[0]?.toUpperCase() || '?';
+    document.getElementById('call-overlay').classList.add('visible');
+    document.getElementById('voice-call-btn').classList.add('active');
+    if (type === 'video') document.getElementById('video-call-btn').classList.add('active');
+  }
+
+  function endCall(skipNotify) {
+    if (activeCall) { try { activeCall.close(); } catch(e){} activeCall = null; }
+    if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+
+    const rv = document.getElementById('remote-video');
+    const lv = document.getElementById('local-video');
+    if (rv) rv.srcObject = null;
+    if (lv) { lv.srcObject = null; lv.classList.add('hidden'); }
+
+    document.getElementById('call-overlay').classList.remove('visible');
+    document.getElementById('outgoing-call-screen').classList.remove('visible');
+    document.getElementById('audio-avatar').classList.remove('visible');
+    document.getElementById('cam-btn').style.display = 'none';
+    document.getElementById('cam-label').style.display = 'none';
+
+    stopCallTimer();
+    resetCallControls();
+    document.getElementById('voice-call-btn').classList.remove('active');
+    document.getElementById('video-call-btn').classList.remove('active');
+
+    if (!skipNotify) { try { secureSend({ type: 'call-ended' }); } catch(e){} }
+    callType = null; callerPeerId = null;
+    addSysMsg('— Call ended —');
+  }
+
+  function toggleMic() {
+    if (!localStream) return;
+    micMuted = !micMuted;
+    localStream.getAudioTracks().forEach(t => { t.enabled = !micMuted; });
+    const btn = document.getElementById('mic-btn');
+    const lbl = document.getElementById('mic-label');
+    btn.classList.toggle('muted', micMuted);
+    lbl.textContent = micMuted ? 'Unmute' : 'Mute';
+    btn.querySelector('svg').innerHTML = micMuted
+      ? `<line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 005.12 2.12M15 9.34V4a3 3 0 00-5.94-.6"/><path d="M17 16.95A7 7 0 015 12v-2m14 0v2a7 7 0 01-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>`
+      : `<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>`;
+  }
+
+  function toggleCam() {
+    if (!localStream) return;
+    camOff = !camOff;
+    localStream.getVideoTracks().forEach(t => { t.enabled = !camOff; });
+    document.getElementById('cam-btn').classList.toggle('muted', camOff);
+    document.getElementById('cam-label').textContent = camOff ? 'Start cam' : 'Camera';
+  }
+
+  function toggleSpeaker() {
+    const btn = document.getElementById('spk-btn');
+    btn.classList.toggle('muted');
+    const rv = document.getElementById('remote-video');
+    if (rv) rv.muted = !rv.muted;
+  }
+
+  function resetCallControls() {
+    micMuted = false; camOff = false;
+    const micBtn = document.getElementById('mic-btn');
+    if (micBtn) {
+      micBtn.classList.remove('muted');
+      micBtn.querySelector('svg').innerHTML = `<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>`;
+    }
+    document.getElementById('mic-label').textContent = 'Mute';
+    const spkBtn = document.getElementById('spk-btn');
+    if (spkBtn) spkBtn.classList.remove('muted');
+  }
+
+  function startCallTimer() {
+    callStartTime = Date.now();
+    const timerEl = document.getElementById('call-timer');
+    callTimerInt = setInterval(() => {
+      const s = Math.floor((Date.now() - callStartTime) / 1000);
+      const m = Math.floor(s / 60).toString().padStart(2,'0');
+      const sec = (s % 60).toString().padStart(2,'0');
+      if (timerEl) timerEl.textContent = m + ':' + sec;
+    }, 1000);
+  }
+
+  function stopCallTimer() {
+    clearInterval(callTimerInt); callTimerInt = null;
+    const timerEl = document.getElementById('call-timer');
+    if (timerEl) timerEl.textContent = '00:00';
+  }
+
+  function handleCallSignal(d) {
+    if (d.type === 'call-offer') {
+      // Store caller's peer ID so we can call them back on accept
+      // conn.peer is the peer ID of the other side's data connection peer
+      callerPeerId = conn ? conn.peer : null;
+      pendingCallType = d.callType || 'audio';
+      const peerName = document.getElementById('chat-peer-name').textContent || 'Peer';
+      document.getElementById('inc-call-title').textContent = peerName + ' is calling';
+      document.getElementById('inc-call-sub').textContent = d.callType === 'video' ? '📹 Video call' : '📞 Voice call';
+      document.getElementById('incoming-call-banner').classList.add('visible');
+    }
+    else if (d.type === 'call-declined') {
+      document.getElementById('outgoing-call-screen').classList.remove('visible');
+      if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+      activeCall = null; callType = null;
+      addSysMsg('— Call declined —');
+    }
+    else if (d.type === 'call-cancelled') {
+      document.getElementById('incoming-call-banner').classList.remove('visible');
+      pendingCallType = null; callerPeerId = null;
+      addSysMsg('— Caller cancelled —');
+    }
+    else if (d.type === 'call-ended') {
+      if (activeCall) { try { activeCall.close(); } catch(e){} activeCall = null; }
+      if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+      document.getElementById('call-overlay').classList.remove('visible');
+      document.getElementById('audio-avatar').classList.remove('visible');
+      document.getElementById('outgoing-call-screen').classList.remove('visible');
+      document.getElementById('incoming-call-banner').classList.remove('visible');
+      stopCallTimer(); resetCallControls();
+      document.getElementById('voice-call-btn').classList.remove('active');
+      document.getElementById('video-call-btn').classList.remove('active');
+      const rv = document.getElementById('remote-video');
+      const lv = document.getElementById('local-video');
+      if (rv) rv.srcObject = null;
+      if (lv) { lv.srcObject = null; lv.classList.add('hidden'); }
+      callType = null; callerPeerId = null;
+      addSysMsg('— Call ended by peer —');
+    }
+  }
+
   boot();
+
+  // Warn about HTTP — calls won't work without HTTPS
+  (function() {
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+      // Inject a dismissible warning strip under the topbar when in chat
+      const strip = document.createElement('div');
+      strip.id = 'https-warning';
+      strip.style.cssText = `
+        position: fixed; top: 0; left: 0; right: 0; z-index: 7000;
+        background: rgba(253,214,99,0.1); border-bottom: 1px solid rgba(253,214,99,0.3);
+        padding: 8px 16px; display: flex; align-items: center; justify-content: space-between;
+        backdrop-filter: blur(10px); gap: 12px;
+      `;
+      strip.innerHTML = `
+        <span style="font-size:0.78rem;color:var(--yellow);font-weight:500;">
+          ⚠️ Voice/Video calls require HTTPS. Currently on HTTP — mic access will be blocked on mobile.
+        </span>
+        <button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:var(--yellow);font-size:1rem;cursor:pointer;padding:0 4px;">✕</button>
+      `;
+      document.body.appendChild(strip);
+    }
+  })();
 
   // Auto-detect invite link in URL
   (function() {
